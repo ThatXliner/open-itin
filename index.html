@@ -263,7 +263,10 @@
     </div>
     <pre id="example-code"><code></code></pre>
     <div style="margin-top: 2rem;">
-      <h3 style="margin-bottom: 0.75rem;">Visual view</h3>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:0.75rem;">
+        <h3 style="margin:0;">Visual view</h3>
+        <button class="btn btn-secondary" id="export-example-btn" style="font-size:0.8rem;padding:5px 12px;">Export as PNG</button>
+      </div>
       <div class="visual-days" id="visual-render"></div>
     </div>
   </div>
@@ -301,6 +304,9 @@
       <button class="btn btn-secondary" id="clear-btn">Clear</button>
     </div>
     <div class="result" id="result"></div>
+    <div id="validator-render-header" style="display:none;align-items:center;gap:12px;margin-top:16px;">
+      <button class="btn btn-secondary" id="export-validator-btn" style="font-size:0.8rem;padding:5px 12px;">Export as PNG</button>
+    </div>
     <div class="visual-days" id="validator-render" style="margin-top: 16px;"></div>
   </div>
 </section>
@@ -313,6 +319,7 @@
 </footer>
 
 <script src="agent-format/dist/open-itin-bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script id="schema-data" type="application/json">
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -528,9 +535,12 @@ document.getElementById('format-toggle').addEventListener('click', (e) => {
 document.getElementById('example-code').textContent = JSON.stringify(examples.pch, null, 2);
 
 // ---- Visual renderer ----
+let _currentExportData = null;
+
 function renderVisual(data, targetId) {
   const container = document.getElementById(targetId || 'visual-render');
   if (!container) return;
+  _currentExportData = data;
   const stops = {};
   (data.stops || []).forEach(s => { stops[s.id] = s; });
   const routes = {};
@@ -625,7 +635,9 @@ async function geocodeStops(data) {
 
     try {
       const url = `${NOMINATIM}?q=${encodeURIComponent(query)}&format=json&limit=1`;
-      const resp = await fetch(url);
+      const resp = await fetch(url, {
+        headers: { 'User-Agent': 'open-itin-validator/0.2 (open-itin-demo)' }
+      });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const results = await resp.json();
       if (results.length > 0) {
@@ -635,9 +647,13 @@ async function geocodeStops(data) {
           source: 'nominatim',
           geocoded_at: new Date().toISOString()
         };
+        resultEl.innerHTML += `<br><span style="font-size:0.85rem">✓ ${s.name}: ${s.coords.lat}, ${s.coords.lng}</span>`;
+      } else {
+        resultEl.innerHTML += `<br><span style="font-size:0.85rem;color:#991b1b">✗ ${s.name}: no results</span>`;
       }
     } catch (e) {
       console.warn(`Geocode failed for "${s.name}": ${e.message}`);
+      resultEl.innerHTML += `<br><span style="font-size:0.85rem;color:#991b1b">✗ ${s.name}: ${e.message}</span>`;
     }
 
     // Nominatim policy: max 1 req/s — be polite
@@ -808,7 +824,11 @@ document.getElementById('render-btn').addEventListener('click', async () => {
   if (document.getElementById('geocode-check').checked && errors.length === 0) {
     await geocodeStops(data);
   }
-  try { renderVisual(data, 'validator-render'); container.scrollIntoView({ behavior: 'smooth' }); }
+  try {
+    renderVisual(data, 'validator-render');
+    container.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('validator-render-header').style.display = 'flex';
+  }
   catch (e) { container.innerHTML = `<p style="color:#991b1b">Render error: ${e.message}</p>`; }
 });
 
@@ -816,6 +836,256 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   document.getElementById('validator-input').value = '';
   document.getElementById('result').className = 'result';
   document.getElementById('validator-render').innerHTML = '';
+  document.getElementById('validator-render-header').style.display = 'none';
+});
+
+// ---- Export as PNG (satori-based, like Vercel/OG) ----
+function calcCardHeight(day) {
+  const HEADER = 41;
+  const NOTE = 24;
+  const ITEMS_PAD = 16;
+  const ITEM_H = 42;
+  const FLEX_ITEM_H = 38;
+  const GAP = 6;
+  const items = day.items || [];
+  let h = HEADER;
+  if (day.note) h += NOTE;
+  h += ITEMS_PAD;
+  for (const item of items) {
+    h += ITEM_H;
+    if (item.type === 'flex') {
+      for (const opt of item.opts || []) {
+        h += FLEX_ITEM_H;
+      }
+    }
+  }
+  h += (items.length - 1) * GAP;
+  return h;
+}
+
+function buildInlineHTML(data) {
+  const stops = {};
+  (data.stops || []).forEach(s => { stops[s.id] = s; });
+  const routes = {};
+  (data.routes || []).forEach(r => { routes[r.id] = r; });
+
+  function durStr(d) {
+    if (!d) return '';
+    const parts = [];
+    if (d.min !== undefined) parts.push(`${d.min}h`);
+    if (d.max !== undefined && d.max !== d.min) parts.push(`–${d.max}h`);
+    return parts.join('');
+  }
+
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function renderItem(item) {
+    if (item.type === 'stop') {
+      const s = stops[item.ref];
+      if (!s) return '';
+      const cat = s.cat || 'other';
+      const color = catColors[cat] || '#999';
+      return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;margin-top:4px;"></span>
+        <div style="flex:1;">
+          <div style="font-weight:600;line-height:1.4;">${esc(s.name)}</div>
+          <div style="color:#888;font-size:12px;line-height:1.4;">${esc(s.goal)}</div>
+          ${s.dur ? `<div style="color:#aaa;font-size:11px;line-height:1.4;">${durStr(s.dur)}</div>` : ''}
+        </div>
+      </div>`;
+    }
+    if (item.type === 'route') {
+      const r = routes[item.ref];
+      if (!r) return '';
+      return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;letter-spacing:0.05em;padding:2px 5px;border:1px solid #d1d5db;border-radius:4px;flex-shrink:0;margin-top:2px;">${esc(r.mode)}</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;line-height:1.4;">${esc(stops[r.from]?.name || r.from)} → ${esc(stops[r.to]?.name || r.to)}</div>
+          <div style="color:#aaa;font-size:11px;line-height:1.4;">${durStr(r.dur)}${r.dist ? ` · ${r.dist}km` : ''}</div>
+        </div>
+      </div>`;
+    }
+    if (item.type === 'note') {
+      return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px;">
+        <div style="flex:1;font-style:italic;line-height:1.4;">${esc(item.txt)}</div>
+      </div>`;
+    }
+    if (item.type === 'flex') {
+      const opts = (item.opts || []).map(o => renderItem(o)).join('');
+      const pick = item.pick || 1;
+      return `<div style="display:flex;flex-direction:column;padding:8px 10px;border-radius:6px;font-size:13px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div style="flex:1;"><span style="font-weight:600;">Choose ${pick}</span></div>
+          <span style="font-size:11px;background:#fde68a;color:#92400e;padding:1px 8px;border-radius:4px;font-weight:600;">pick ${pick}</span>
+        </div>
+        <div">${opts}</div>
+      </div>`;
+    }
+    return '';
+  }
+
+  const CARD_W = 280;
+  const GAP = 20;
+  const PAD = 20;
+
+  const days = data.days || [];
+  let totalH = PAD;
+  for (const day of days) {
+    totalH += calcCardHeight(day) + GAP;
+  }
+  totalH += PAD - GAP;
+
+  const totalW = 2 * PAD + CARD_W;
+
+  const cards = days.map((day, i) => `
+    <div style="display:flex;flex-direction:column;border-radius:10px;overflow:hidden;background:#fff;width:${CARD_W}px;border:1px solid #e5e5e5;">
+      <div style="padding:12px 16px;font-size:14px;font-weight:700;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+        <span>Day ${i + 1} — ${day.date}</span>
+      </div>
+      ${day.note ? `<div style="padding:8px 16px;font-size:12px;color:#888;">${esc(day.note)}</div>` : ''}
+      <div style="padding:8px;display:flex;flex-direction:column;gap:6px;">
+        ${(day.items || []).map(item => renderItem(item)).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  return {
+    html: `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:${GAP}px;padding:${PAD}px;background:#fafafa;width:${totalW}px;">${cards}</div>`,
+    width: totalW,
+    height: totalH
+  };
+}
+
+async function exportPNG(elementId, filename) {
+  const el = document.getElementById(elementId);
+  if (!el || !el.children.length) return;
+
+  try {
+    await exportViaSatori(filename);
+  } catch (e) {
+    console.warn('Satori export failed, trying foreignObject fallback:', e.message);
+    try {
+      await exportViaForeignObject(el, filename);
+    } catch (e2) {
+      console.warn('foreignObject export failed, trying html2canvas fallback:', e2.message);
+      try {
+        const canvas = await html2canvas(el, { scale: 2, letterRendering: true, backgroundColor: getComputedStyle(document.body).backgroundColor, logging: false });
+        triggerDownload(canvas.toDataURL('image/png'), filename);
+      } catch (e3) {
+        console.warn('PNG export failed:', e3.message);
+      }
+    }
+  }
+}
+
+async function exportViaSatori(filename) {
+  if (!_currentExportData) throw new Error('No data to export');
+
+  const [satoriMod, htmlMod] = await Promise.all([
+    import('https://esm.sh/satori@0.10.0'),
+    import('https://esm.sh/satori-html@0.1.0')
+  ]);
+  const satori = satoriMod.default;
+  const htmlFn = htmlMod.html || htmlMod.default || htmlMod;
+
+  // Load Inter font for proper text rendering with kerning
+  const fontCSS = await fetch('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap').then(r => r.text());
+  const fontUrls = [...fontCSS.matchAll(/url\(([^)]+)\)/g)].map(m => m[1]);
+  const fontWeights = [...fontCSS.matchAll(/font-weight:\s*(\d+)/g)].map(m => parseInt(m[1]));
+  const fontData = await Promise.all(fontUrls.map(url => fetch(url).then(r => r.arrayBuffer())));
+  const fonts = fontData.map((data, i) => ({
+    name: 'Inter',
+    data,
+    weight: fontWeights[i] || 400,
+    style: 'normal'
+  }));
+
+  const { html, width, height } = buildInlineHTML(_currentExportData);
+  const vnode = htmlFn(html);
+  const svg = await satori(vnode, { width, height, fonts });
+
+  // Render SVG to PNG via canvas
+  const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+    img.src = url;
+  });
+  const canvas = document.createElement('canvas');
+  const DPR = window.devicePixelRatio || 2;
+  canvas.width = width * DPR;
+  canvas.height = height * DPR;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(DPR, DPR);
+  ctx.drawImage(img, 0, 0);
+  URL.revokeObjectURL(url);
+  triggerDownload(canvas.toDataURL('image/png'), filename);
+}
+
+async function exportViaForeignObject(el, filename) {
+  const styleSheets = Array.from(document.styleSheets);
+  let cssText = '';
+  for (const ss of styleSheets) {
+    try { for (const rule of ss.cssRules) cssText += rule.cssText; } catch (_) {}
+  }
+  const clone = el.cloneNode(true);
+  clone.style.background = getComputedStyle(el).background || '#fff';
+  const wrapper = document.createElement('div');
+  wrapper.appendChild(clone);
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('xmlns', svgNS);
+  svg.setAttribute('width', el.offsetWidth);
+  svg.setAttribute('height', el.offsetHeight);
+  svg.setAttribute('viewBox', `0 0 ${el.offsetWidth} ${el.offsetHeight}`);
+  const foreign = document.createElementNS(svgNS, 'foreignObject');
+  foreign.setAttribute('width', '100%');
+  foreign.setAttribute('height', '100%');
+  const body = document.createElement('body');
+  body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+  body.style.margin = '0';
+  body.style.padding = '0';
+  body.style.background = getComputedStyle(document.body).backgroundColor;
+  const style = document.createElement('style');
+  style.textContent = cssText;
+  body.appendChild(style);
+  body.appendChild(wrapper);
+  foreign.appendChild(body);
+  svg.appendChild(foreign);
+  const serializer = new XMLSerializer();
+  const svgBlob = new Blob([serializer.serializeToString(svg)], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+    img.src = url;
+  });
+  const canvas = document.createElement('canvas');
+  canvas.width = el.offsetWidth * 2;
+  canvas.height = el.offsetHeight * 2;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+  ctx.drawImage(img, 0, 0);
+  URL.revokeObjectURL(url);
+  triggerDownload(canvas.toDataURL('image/png'), filename);
+}
+
+function triggerDownload(dataUrl, filename) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = dataUrl;
+  link.click();
+}
+
+document.getElementById('export-example-btn').addEventListener('click', () => {
+  exportPNG('visual-render', 'open-itin-example.png');
+});
+
+document.getElementById('export-validator-btn').addEventListener('click', () => {
+  exportPNG('validator-render', 'open-itin-itinerary.png');
 });
 
 // ---- Copy buttons ----
