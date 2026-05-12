@@ -1,0 +1,197 @@
+{
+  "$schema": "https://openitin.org/schema/v1",
+  "name": "SF to LA Road Trip",
+  "tz": "America/Los_Angeles",
+  "cur": "USD",
+  "desc": "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1",
+  "stops": [
+    {
+      "id": "sf",
+      "name": "San Francisco",
+      "cat": "attraction",
+      "addr": "San Francisco, CA 94102",
+      "note": "Start here early morning"
+    },
+    {
+      "id": "monterey",
+      "name": "Monterey Bay Aquarium",
+      "cat": "attraction",
+      "addr": "886 Cannery Row, Monterey, CA 93940",
+      "dur": "PT2H",
+      "cost": { "amt": 65, "cur": "USD" },
+      "url": "https://www.montereybayaquarium.org"
+    },
+    {
+      "id": "big-sur-inn",
+      "name": "Big Sur River Inn",
+      "cat": "hotel",
+      "addr": "46800 CA-1, Big Sur, CA 93920",
+      "cost": { "amt": 280 },
+      "url": "https://www.bigsurriverinn.com",
+      "note": "Book a creekside room"
+    },
+    {
+      "id": "mcway-falls",
+      "name": "McWay Falls",
+      "cat": "attraction",
+      "addr": "Julia Pfeiffer Burns State Park, CA-1, Big Sur, CA 93920",
+      "dur": "PT30M",
+      "note": "Quick stop for photos, no hiking required"
+    },
+    {
+      "id": "hearst-castle",
+      "name": "Hearst Castle",
+      "cat": "attraction",
+      "addr": "750 Hearst Castle Rd, San Simeon, CA 93452",
+      "dur": "PT2H30M",
+      "cost": { "amt": 30 },
+      "url": "https://hearstcastle.org",
+      "note": "Book the Grand Rooms tour in advance"
+    },
+    {
+      "id": "solvang",
+      "name": "Solvang",
+      "cat": "attraction",
+      "addr": "Solvang, CA 93463",
+      "dur": "PT1H30M",
+      "note": "Danish-style town, grab a pastry"
+    },
+    {
+      "id": "santa-barbara-inn",
+      "name": "Santa Barbara Inn",
+      "cat": "hotel",
+      "addr": "901 E Cabrillo Blvd, Santa Barbara, CA 93103",
+      "cost": { "amt": 350 },
+      "note": "Ocean view if available"
+    },
+    {
+      "id": "santa-barbara-pier",
+      "name": "Stearns Wharf",
+      "cat": "attraction",
+      "addr": "217 Stearns Wharf, Santa Barbara, CA 93101",
+      "dur": "PT1H"
+    },
+    {
+      "id": "santa-monica",
+      "name": "Santa Monica Pier",
+      "cat": "attraction",
+      "addr": "200 Santa Monica Pier, Santa Monica, CA 90401",
+      "dur": "PT1H",
+      "note": "End the trip here"
+    },
+    {
+      "id": "la-hotel",
+      "name": "Hotel in LA",
+      "cat": "hotel",
+      "addr": "Los Angeles, CA 90012"
+    }
+  ],
+  "routes": [
+    {
+      "id": "sf-to-monterey",
+      "from": "sf",
+      "to": "monterey",
+      "mode": "drive",
+      "dur": "PT2H",
+      "dist": 180,
+      "note": "Take I-280 S to CA-1 S, scenic but slower"
+    },
+    {
+      "id": "monterey-to-bigsur",
+      "from": "monterey",
+      "to": "big-sur-inn",
+      "mode": "drive",
+      "dur": "PT45M",
+      "dist": 55,
+      "note": "CA-1 S, Bixby Bridge is a must-stop photo op"
+    },
+    {
+      "id": "bigsur-to-hearst",
+      "from": "big-sur-inn",
+      "to": "hearst-castle",
+      "mode": "drive",
+      "dur": "PT1H30M",
+      "dist": 100,
+      "note": "Stop at McWay Falls on the way"
+    },
+    {
+      "id": "hearst-to-solvang",
+      "from": "hearst-castle",
+      "to": "solvang",
+      "mode": "drive",
+      "dur": "PT1H15M",
+      "dist": 110
+    },
+    {
+      "id": "solvang-to-sb",
+      "from": "solvang",
+      "to": "santa-barbara-inn",
+      "mode": "drive",
+      "dur": "PT45M",
+      "dist": 55,
+      "note": "CA-154 for mountain views, or US-101 for speed"
+    },
+    {
+      "id": "sb-to-la",
+      "from": "santa-barbara-inn",
+      "to": "santa-monica",
+      "mode": "drive",
+      "dur": "PT2H",
+      "dist": 150,
+      "note": "US-101 S, traffic builds after 3pm"
+    }
+  ],
+  "days": [
+    {
+      "date": "2026-06-15",
+      "note": "SF to Big Sur — the best stretch of coastline",
+      "items": [
+        { "type": "stop", "ref": "sf" },
+        { "type": "route", "ref": "sf-to-monterey" },
+        { "type": "stop", "ref": "monterey" },
+        { "type": "note", "txt": "Grab lunch on Cannery Row" },
+        { "type": "route", "ref": "monterey-to-bigsur" },
+        { "type": "stop", "ref": "big-sur-inn" }
+      ]
+    },
+    {
+      "date": "2026-06-16",
+      "note": "Big Sur to Santa Barbara — castles, Danish towns, and ocean views",
+      "items": [
+        { "type": "stop", "ref": "mcway-falls" },
+        { "type": "route", "ref": "bigsur-to-hearst" },
+        { "type": "stop", "ref": "hearst-castle" },
+        { "type": "route", "ref": "hearst-to-solvang" },
+        { "type": "stop", "ref": "solvang" },
+        { "type": "route", "ref": "solvang-to-sb" },
+        { "type": "stop", "ref": "santa-barbara-inn" },
+        {
+          "type": "flex",
+          "pick": 1,
+          "opts": [
+            { "type": "stop", "ref": "santa-barbara-pier" },
+            { "type": "note", "txt": "Walk State Street for shopping and wine tasting" }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-17",
+      "note": "Santa Barbara to LA — final stretch",
+      "items": [
+        { "type": "route", "ref": "sb-to-la" },
+        { "type": "stop", "ref": "santa-monica" },
+        {
+          "type": "flex",
+          "pick": 1,
+          "opts": [
+            { "type": "note", "txt": "Dinner in Venice Beach — try Gjelina" },
+            { "type": "note", "txt": "Dinner in Santa Monica — try Cassia" },
+            { "type": "note", "txt": "Head to Koreatown for Korean BBQ" }
+          ]
+        },
+        { "type": "stop", "ref": "la-hotel" }
+      ]
+    }
+  ]
+}

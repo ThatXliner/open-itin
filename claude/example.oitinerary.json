@@ -1,0 +1,322 @@
+{
+  "$schema": "https://openitinerary.org/schema/v0.1/itinerary.schema.json",
+  "version": "0.1",
+  "title": "Pacific Coast Highway: San Francisco to Los Angeles",
+  "summary": "A 3-day drive down California's Highway 1, hugging the coast from San Francisco to Los Angeles. Expect stunning cliff views, fresh seafood, and at least one stop that makes you consider moving there.",
+  "tags": ["road-trip", "coastal", "california", "scenic", "pch"],
+  "duration_days": 3,
+  "travel_modes": ["driving", "walking"],
+  "generated_by": "claude-sonnet-4",
+  "created_at": "2025-05-11T10:00:00Z",
+  "stops": [
+    {
+      "id": "stop-1-sf-start",
+      "day": 1,
+      "location": {
+        "name": "Golden Gate Bridge Vista Point",
+        "address": "Vista Point, Sausalito, CA 94965",
+        "coords": {
+          "lat": 37.8324,
+          "lng": -122.4795,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Start the trip with a photo at the iconic northern overlook before heading south",
+      "category": "viewpoint",
+      "duration": {
+        "min_hours": 0.25,
+        "max_hours": 0.75
+      },
+      "notes": "Parking fills fast on weekends. Arrive before 9am or expect a wait."
+    },
+    {
+      "id": "stop-2-pacifica-lunch",
+      "day": 1,
+      "location": {
+        "name": "Pacifica, CA",
+        "coords": {
+          "lat": 37.6138,
+          "lng": -122.4869,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Grab an early lunch with ocean views before the coast road narrows",
+      "category": "food",
+      "duration": {
+        "min_hours": 0.75,
+        "max_hours": 1.5
+      },
+      "alternatives": [
+        {
+          "location": {
+            "name": "Taco Bell Cantina, Pacifica",
+            "coords": {
+              "lat": 37.611,
+              "lng": -122.4872,
+              "source": "nominatim",
+              "geocoded_at": "2025-05-11T10:00:00Z"
+            }
+          },
+          "goal": "The one Taco Bell with a Pacific Ocean view — genuinely worth it",
+          "category": "food",
+          "notes": "Yes, really. It's a meme, but the view is real."
+        }
+      ]
+    },
+    {
+      "id": "stop-3-half-moon-bay",
+      "day": 1,
+      "location": {
+        "name": "Half Moon Bay State Beach",
+        "address": "Half Moon Bay, CA 94019",
+        "coords": {
+          "lat": 37.4876,
+          "lng": -122.4702,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Walk the beach and decompress — first proper coastal stop of the trip",
+      "category": "nature",
+      "duration": {
+        "min_hours": 0.5,
+        "max_hours": 2
+      },
+      "notes": "Water is cold year-round. Bring a layer — it's windier than it looks."
+    },
+    {
+      "id": "stop-4-santa-cruz",
+      "day": 1,
+      "location": {
+        "name": "Santa Cruz Beach Boardwalk",
+        "address": "400 Beach St, Santa Cruz, CA 95060",
+        "place_id": "gplaces:ChIJI7oMkRnLj4ARbVTBBKHuSBc",
+        "coords": {
+          "lat": 36.9647,
+          "lng": -122.0184,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Stretch, grab a snack, and catch the sunset over the boardwalk",
+      "category": "attraction",
+      "duration": {
+        "min_hours": 1,
+        "max_hours": 3
+      },
+      "notes": "The Giant Dipper roller coaster is a legit historic landmark (1924). Free to walk the boardwalk."
+    },
+    {
+      "id": "stop-5-overnight-monterey",
+      "day": 1,
+      "location": {
+        "name": "Monterey, CA",
+        "coords": {
+          "lat": 36.6002,
+          "lng": -121.8947,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Overnight stay — good base for Day 2's Big Sur drive",
+      "category": "accommodation",
+      "duration": {
+        "min_hours": 10,
+        "max_hours": 14
+      },
+      "notes": "Book ahead in summer. The Cannery Row area puts you close to the aquarium and Fisherman's Wharf.",
+      "alternatives": [
+        {
+          "location": {
+            "name": "Carmel-by-the-Sea, CA",
+            "coords": {
+              "lat": 36.5552,
+              "lng": -121.9233,
+              "source": "nominatim",
+              "geocoded_at": "2025-05-11T10:00:00Z"
+            }
+          },
+          "goal": "Quieter, more upscale overnight option 10 min south of Monterey",
+          "category": "accommodation",
+          "notes": "Charming but pricier. Good choice if you want to avoid the Cannery Row tourist density."
+        }
+      ]
+    },
+    {
+      "id": "stop-6-17-mile-drive",
+      "day": 2,
+      "location": {
+        "name": "17-Mile Drive, Pebble Beach",
+        "coords": {
+          "lat": 36.5726,
+          "lng": -121.9651,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Morning scenic drive through Pebble Beach — Lone Cypress is the money shot",
+      "category": "viewpoint",
+      "duration": {
+        "min_hours": 1,
+        "max_hours": 2
+      },
+      "notes": "Entrance fee (~$12/vehicle as of 2024). Worth it. Opens at sunrise."
+    },
+    {
+      "id": "stop-7-big-sur",
+      "day": 2,
+      "location": {
+        "name": "Bixby Creek Bridge, Big Sur",
+        "coords": {
+          "lat": 36.3714,
+          "lng": -121.9018,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "The iconic Big Sur viewpoint — pull over here, full stop",
+      "category": "viewpoint",
+      "duration": {
+        "min_hours": 0.25,
+        "max_hours": 1
+      },
+      "notes": "Tiny pullout on the north side of the bridge fills instantly. If full, loop back — it turns over fast. Check for road closures on Caltrans before this leg; Highway 1 through Big Sur has a history of washouts."
+    },
+    {
+      "id": "stop-8-pfeiffer-beach",
+      "day": 2,
+      "location": {
+        "name": "Pfeiffer Beach, Big Sur",
+        "coords": {
+          "lat": 36.2395,
+          "lng": -121.815,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Purple-sand beach with a rock arch — one of the weirdest and best beaches in California",
+      "category": "nature",
+      "duration": {
+        "min_hours": 0.5,
+        "max_hours": 2
+      },
+      "notes": "Easy to miss — look for Sycamore Canyon Rd, unmarked. Cash or app payment at the gate. The purple sand is real (manganese garnet)."
+    },
+    {
+      "id": "stop-9-overnight-san-simeon",
+      "day": 2,
+      "location": {
+        "name": "San Simeon / Cambria, CA",
+        "coords": {
+          "lat": 35.6408,
+          "lng": -121.1878,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Overnight stay — positioned for an early Hearst Castle visit on Day 3",
+      "category": "accommodation",
+      "duration": {
+        "min_hours": 10,
+        "max_hours": 14
+      },
+      "notes": "San Simeon is tiny; Cambria (5 min south) has more restaurant options. Elephant seals at Piedras Blancas rookery just north — check at dusk or dawn.",
+      "alternatives": [
+        {
+          "location": {
+            "name": "Morro Bay, CA",
+            "coords": {
+              "lat": 35.3659,
+              "lng": -120.8499,
+              "source": "nominatim",
+              "geocoded_at": "2025-05-11T10:00:00Z"
+            }
+          },
+          "goal": "Larger town with more dining, 30 min south — good if Cambria feels too remote",
+          "category": "accommodation"
+        }
+      ]
+    },
+    {
+      "id": "stop-10-hearst-castle",
+      "day": 3,
+      "location": {
+        "name": "Hearst Castle",
+        "address": "750 Hearst Castle Rd, San Simeon, CA 93452",
+        "place_id": "gplaces:ChIJi5RnHjSmV4ARSjQaF8sQMRE",
+        "coords": {
+          "lat": 35.6853,
+          "lng": -121.1686,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Tour the most absurd private home in American history",
+      "category": "attraction",
+      "duration": {
+        "min_hours": 2,
+        "max_hours": 4
+      },
+      "notes": "Tickets must be booked in advance online. Multiple tour types — Grand Rooms is the best first-timer option."
+    },
+    {
+      "id": "stop-11-slo",
+      "day": 3,
+      "location": {
+        "name": "San Luis Obispo, CA",
+        "coords": {
+          "lat": 35.2828,
+          "lng": -120.6596,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "Lunch stop in a genuinely great college town — Bubble Gum Alley is optional but mandatory",
+      "category": "food",
+      "duration": {
+        "min_hours": 1,
+        "max_hours": 2.5
+      },
+      "alternatives": [
+        {
+          "location": {
+            "name": "Pismo Beach, CA",
+            "coords": {
+              "lat": 35.1428,
+              "lng": -120.6413,
+              "source": "nominatim",
+              "geocoded_at": "2025-05-11T10:00:00Z"
+            }
+          },
+          "goal": "Skip SLO and eat clam chowder on the pier instead",
+          "category": "food",
+          "notes": "The clam chowder in a sourdough bowl is not a cliché — it's just correct."
+        }
+      ]
+    },
+    {
+      "id": "stop-12-la-arrival",
+      "day": 3,
+      "location": {
+        "name": "Santa Monica Pier, Los Angeles",
+        "address": "200 Santa Monica Pier, Santa Monica, CA 90401",
+        "place_id": "gplaces:ChIJYTN9T-plwoAR9C_kFCSTaIQ",
+        "coords": {
+          "lat": 34.0092,
+          "lng": -118.4973,
+          "source": "nominatim",
+          "geocoded_at": "2025-05-11T10:00:00Z"
+        }
+      },
+      "goal": "End of Route 66 marker — touch the sign, get a photo, call it done",
+      "category": "attraction",
+      "duration": {
+        "min_hours": 0.5,
+        "max_hours": 2
+      },
+      "notes": "You made it. The pier itself is touristy but the symbolism is real. Sunset here is a solid finish to the drive."
+    }
+  ]
+}

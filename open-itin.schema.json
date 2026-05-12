@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openitin.org/schema/v1",
+  "title": "Open Itinerary",
+  "description": "An open, token-efficient format for travel itineraries — designed for AI agents to output and apps to consume.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Trip name (e.g. 'SF to LA Road Trip')"
+    },
+    "tz": {
+      "type": "string",
+      "description": "Default IANA timezone for the trip (e.g. 'America/Los_Angeles')"
+    },
+    "cur": {
+      "type": "string",
+      "description": "Default ISO 4217 currency code (e.g. 'USD')",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "desc": {
+      "type": "string",
+      "description": "Short description or summary of the trip"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL for the trip (booking, guide, etc.)"
+    },
+    "stops": {
+      "type": "array",
+      "description": "Reusable catalog of stops (places you spend time). Referenced by id from days.",
+      "items": { "$ref": "#/$defs/Stop" }
+    },
+    "routes": {
+      "type": "array",
+      "description": "Reusable catalog of routes (travel between stops). Referenced by id from days.",
+      "items": { "$ref": "#/$defs/Route" }
+    },
+    "days": {
+      "type": "array",
+      "description": "Ordered days of the trip",
+      "items": { "$ref": "#/$defs/Day" }
+    }
+  },
+  "required": ["name", "days"],
+  "$defs": {
+    "Stop": {
+      "type": "object",
+      "description": "A place you spend time — hotel, restaurant, museum, trailhead, etc.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier referenced by days (e.g. 'stop-hotel')"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name (e.g. 'Golden Gate Bridge')"
+        },
+        "cat": {
+          "type": "string",
+          "description": "Category: attraction, hotel, restaurant, transit, trail, or other",
+          "enum": ["attraction", "hotel", "restaurant", "transit", "trail", "other"]
+        },
+        "addr": {
+          "type": "string",
+          "description": "Street address or place name for geocoding (e.g. 'Golden Gate Bridge, San Francisco, CA 94129'). Consuming apps geocode this to coordinates at runtime."
+        },
+        "tz": {
+          "type": "string",
+          "description": "IANA timezone override for this stop (e.g. 'America/Denver')"
+        },
+        "dep": {
+          "type": "string",
+          "description": "Departure time — ISO 8601 time ('14:00') or datetime ('2026-06-15T14:00:00-07:00')"
+        },
+        "arr": {
+          "type": "string",
+          "description": "Arrival time — ISO 8601 time ('14:00') or datetime ('2026-06-15T14:00:00-07:00')"
+        },
+        "dur": {
+          "type": "string",
+          "description": "How long you spend here — ISO 8601 duration ('PT1H', 'PT2H30M')"
+        },
+        "cost": {
+          "type": "object",
+          "description": "Estimated cost",
+          "properties": {
+            "amt": { "type": "number", "description": "Amount" },
+            "cur": { "type": "string", "description": "ISO 4217 currency (defaults to trip currency)", "pattern": "^[A-Z]{3}$" }
+          },
+          "required": ["amt"]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for more info, booking, menu, etc."
+        },
+        "note": {
+          "type": "string",
+          "description": "Freeform note about this stop"
+        }
+      },
+      "required": ["id", "name"]
+    },
+    "Route": {
+      "type": "object",
+      "description": "Travel between two stops — drive, fly, train, walk, etc.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier referenced by days (e.g. 'route-drive-to-la')"
+        },
+        "from": {
+          "type": "string",
+          "description": "Stop id this route starts from"
+        },
+        "to": {
+          "type": "string",
+          "description": "Stop id this route ends at"
+        },
+        "mode": {
+          "type": "string",
+          "description": "Mode of transportation",
+          "enum": ["drive", "fly", "train", "bus", "walk", "bike", "transit", "ferry", "other"]
+        },
+        "dur": {
+          "type": "string",
+          "description": "Travel duration — ISO 8601 duration ('PT6H30M', 'PT45M')"
+        },
+        "dist": {
+          "type": "number",
+          "description": "Distance in kilometers",
+          "minimum": 0
+        },
+        "dep": {
+          "type": "string",
+          "description": "Departure time — ISO 8601 time or datetime"
+        },
+        "arr": {
+          "type": "string",
+          "description": "Arrival time — ISO 8601 time or datetime"
+        },
+        "cost": {
+          "type": "object",
+          "description": "Estimated cost",
+          "properties": {
+            "amt": { "type": "number" },
+            "cur": { "type": "string", "pattern": "^[A-Z]{3}$" }
+          },
+          "required": ["amt"]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for directions, booking, schedule, etc."
+        },
+        "note": {
+          "type": "string",
+          "description": "Freeform note about this route"
+        }
+      },
+      "required": ["id", "from", "to", "mode"]
+    },
+    "Day": {
+      "type": "object",
+      "description": "One day of the trip",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "ISO 8601 date (e.g. '2026-06-15')",
+          "format": "date"
+        },
+        "tz": {
+          "type": "string",
+          "description": "IANA timezone override for this day"
+        },
+        "items": {
+          "type": "array",
+          "description": "Ordered items for the day — stops, routes, notes, and flexible blocks",
+          "items": { "$ref": "#/$defs/DayItem" }
+        },
+        "note": {
+          "type": "string",
+          "description": "Freeform note about this day"
+        }
+      },
+      "required": ["date"]
+    },
+    "DayItem": {
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Reference to a stop from the trip's stops catalog",
+          "properties": {
+            "type": { "type": "string", "const": "stop" },
+            "ref": { "type": "string", "description": "Stop id" }
+          },
+          "required": ["type", "ref"]
+        },
+        {
+          "type": "object",
+          "description": "Reference to a route from the trip's routes catalog",
+          "properties": {
+            "type": { "type": "string", "const": "route" },
+            "ref": { "type": "string", "description": "Route id" }
+          },
+          "required": ["type", "ref"]
+        },
+        {
+          "type": "object",
+          "description": "Freeform note within a day's timeline",
+          "properties": {
+            "type": { "type": "string", "const": "note" },
+            "txt": { "type": "string", "description": "Note text" }
+          },
+          "required": ["type", "txt"]
+        },
+        {
+          "type": "object",
+          "description": "A set of alternatives — pick N from the options (e.g. 'choose one of these three restaurants')",
+          "properties": {
+            "type": { "type": "string", "const": "flex" },
+            "pick": {
+              "type": "integer",
+              "description": "How many options to choose (default 1)",
+              "minimum": 1,
+              "default": 1
+            },
+            "opts": {
+              "type": "array",
+              "description": "The alternatives to choose from",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": { "const": "stop" },
+                      "ref": { "type": "string" }
+                    },
+                    "required": ["type", "ref"]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": { "const": "route" },
+                      "ref": { "type": "string" }
+                    },
+                    "required": ["type", "ref"]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": { "const": "note" },
+                      "txt": { "type": "string" }
+                    },
+                    "required": ["type", "txt"]
+                  }
+                ]
+              }
+            }
+          },
+          "required": ["type", "opts"]
+        }
+      ]
+    }
+  }
+}
