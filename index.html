@@ -257,6 +257,10 @@
       <button class="active" data-example="pch">CA Road Trip</button>
       <button data-example="tokyo">Tokyo Weekend</button>
     </div>
+    <div class="example-toggle" id="format-toggle">
+      <button class="active" data-format="json">JSON (.oitinerary.json)</button>
+      <button data-format="kdl">KDL (.oitinerary.kdl)</button>
+    </div>
     <pre id="example-code"><code></code></pre>
     <div style="margin-top: 2rem;">
       <h3 style="margin-bottom: 0.75rem;">Visual view</h3>
@@ -285,8 +289,8 @@
 <section id="validator">
   <div class="container">
     <h2>Validator</h2>
-    <p>Paste an Open Itinerary JSON below and validate it:</p>
-    <textarea id="validator-input" placeholder='{&#10;  "$schema": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",&#10;  "version": "0.2",&#10;  "name": "Your trip name",&#10;  "stops": [...],&#10;  "days": [...]&#10;}'></textarea>
+    <p>Paste a JSON or KDL itinerary below and validate it:</p>
+    <textarea id="validator-input" placeholder='Paste JSON or KDL...&#10;&#10;JSON: { "version": "0.2", "name": "My Trip", "stops": [...], "days": [...] }&#10;&#10;KDL: itinerary "My Trip" {&#10;  stop "s1" {&#10;    name "..."&#10;    goal "..."&#10;  }&#10;  ...&#10;}'></textarea>
     <div style="margin-top:12px;">
       <button class="btn btn-primary" id="validate-btn">Validate</button>
       <button class="btn btn-secondary" id="render-btn">Render</button>
@@ -308,6 +312,7 @@
   </div>
 </footer>
 
+<script src="agent-format/dist/open-itin-bundle.js"></script>
 <script id="schema-data" type="application/json">
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -483,16 +488,43 @@ const examples = {
   }
 };
 
-// ---- Example toggle ----
+// Generate KDL versions from the JSON examples
+const kdlExamples = {};
+if (window.OpenItin) {
+  for (const key of Object.keys(examples)) {
+    kdlExamples[key] = OpenItin.format(OpenItin.fromJSON(examples[key]));
+  }
+}
+
+// ---- Example toggles ----
 let currentExample = 'pch';
+let currentFormat = 'json';
+
+function updateExampleDisplay() {
+  if (currentFormat === 'kdl' && kdlExamples[currentExample]) {
+    document.getElementById('example-code').textContent = kdlExamples[currentExample];
+  } else {
+    document.getElementById('example-code').textContent = JSON.stringify(examples[currentExample], null, 2);
+  }
+  renderVisual(examples[currentExample]);
+}
+
 document.querySelector('.example-toggle').addEventListener('click', (e) => {
   if (e.target.tagName !== 'BUTTON') return;
   document.querySelectorAll('.example-toggle button').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
   currentExample = e.target.dataset.example;
-  document.getElementById('example-code').textContent = JSON.stringify(examples[currentExample], null, 2);
-  renderVisual(examples[currentExample]);
+  updateExampleDisplay();
 });
+
+document.getElementById('format-toggle').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#format-toggle button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentFormat = e.target.dataset.format;
+  updateExampleDisplay();
+});
+
 document.getElementById('example-code').textContent = JSON.stringify(examples.pch, null, 2);
 
 // ---- Visual renderer ----
@@ -615,6 +647,24 @@ async function geocodeStops(data) {
   }
 }
 
+// ---- Format detection ----
+function detectFormat(input) {
+  const trimmed = input.trim();
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) return 'json';
+  if (window.OpenItin && /^itinerary\s/.test(trimmed)) return 'kdl';
+  return 'unknown';
+}
+
+function parseInput(input) {
+  const fmt = detectFormat(input);
+  if (fmt === 'json') return JSON.parse(input);
+  if (fmt === 'kdl') {
+    const itinerary = OpenItin.parse(input);
+    return OpenItin.toJSON(itinerary);
+  }
+  throw new Error('Unrecognized format. Paste JSON (starting with {) or KDL (starting with "itinerary").');
+}
+
 // ---- Validator ----
 function validate(itinerary) {
   const errors = [];
@@ -699,10 +749,18 @@ function validate(itinerary) {
 document.getElementById('validate-btn').addEventListener('click', () => {
   const result = document.getElementById('result');
   const input = document.getElementById('validator-input').value.trim();
-  if (!input) { result.className = 'result error'; result.innerHTML = 'Paste some JSON first.'; return; }
+  if (!input) { result.className = 'result error'; result.innerHTML = 'Paste JSON or KDL first.'; return; }
   let data;
-  try { data = JSON.parse(input); }
-  catch (e) { result.className = 'result error'; result.innerHTML = `Invalid JSON: ${e.message}`; return; }
+  try { data = parseInput(input); }
+  catch (e) {
+    result.className = 'result error';
+    if (typeof e === 'object' && e !== null && e.name === 'ParseError') {
+      result.innerHTML = `KDL parse error: ${e.message}`;
+    } else {
+      result.innerHTML = `Parse error: ${e.message}`;
+    }
+    return;
+  }
   const errors = validate(data);
   if (errors.length === 0) {
     result.className = 'result success';
@@ -714,7 +772,11 @@ document.getElementById('validate-btn').addEventListener('click', () => {
 });
 
 document.getElementById('load-example-btn').addEventListener('click', () => {
-  document.getElementById('validator-input').value = JSON.stringify(examples[currentExample], null, 2);
+  if (currentFormat === 'kdl' && kdlExamples[currentExample]) {
+    document.getElementById('validator-input').value = kdlExamples[currentExample];
+  } else {
+    document.getElementById('validator-input').value = JSON.stringify(examples[currentExample], null, 2);
+  }
   document.getElementById('result').className = 'result';
 });
 
@@ -722,10 +784,19 @@ document.getElementById('render-btn').addEventListener('click', async () => {
   const container = document.getElementById('validator-render');
   const result = document.getElementById('result');
   const input = document.getElementById('validator-input').value.trim();
-  if (!input) { result.className = 'result error'; result.innerHTML = 'Paste some JSON first.'; container.innerHTML = ''; return; }
+  if (!input) { result.className = 'result error'; result.innerHTML = 'Paste JSON or KDL first.'; container.innerHTML = ''; return; }
   let data;
-  try { data = JSON.parse(input); }
-  catch (e) { result.className = 'result error'; result.innerHTML = `Invalid JSON: ${e.message}`; container.innerHTML = ''; return; }
+  try { data = parseInput(input); }
+  catch (e) {
+    result.className = 'result error';
+    if (typeof e === 'object' && e !== null && e.name === 'ParseError') {
+      result.innerHTML = `KDL parse error: ${e.message}`;
+    } else {
+      result.innerHTML = `Parse error: ${e.message}`;
+    }
+    container.innerHTML = '';
+    return;
+  }
   const errors = validate(data);
   if (errors.length > 0) {
     result.className = 'result error';

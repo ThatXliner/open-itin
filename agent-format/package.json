@@ -6,7 +6,8 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:browser": "esbuild src/browser-entry.ts --outfile=dist/open-itin-bundle.js --target=es2020 --format=iife --global-name=OpenItin --bundle --minify"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
