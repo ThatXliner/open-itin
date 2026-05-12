@@ -37,11 +37,11 @@ Every stop in an Open Itinerary must declare *why* you're going there. This is t
 2. **For consuming apps**: It provides a display-ready purpose string that works without further parsing. A map view can show the goal as a subtitle. A timeline can display it as the primary description.
 3. **For travelers**: It communicates what matters about each stop. A traveler reading the itinerary can decide whether a stop aligns with their interests without researching it externally.
 
-### 2.2 Specification
+### 2.2 Validation
 
-The data model is defined by a JSON Schema. Field descriptions, constraints, and examples live in the schema itself. Any JSON Schema validator in any language can validate an Open Itinerary document—adoption requires nothing more than pointing a validator at the schema URI.
+Today, the data model ships with a JSON Schema for validation. Any JSON Schema validator in any language can check an Open Itinerary document—adoption requires nothing more than pointing a validator at the schema URI. Every document declares its `$schema` and `version` so consuming apps can detect version changes.
 
-Every document declares `"$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json"` and `"version": "0.2"`. The pinned URI ensures consuming apps can detect version changes and handle them explicitly.
+JSON Schema is an implementation detail, not the format itself. The data model—stops with goals, routes between them, days with ordered items, flex blocks—exists independently of how it is serialized or validated. A future Phase 2 format will use a custom serialization with the same underlying model.
 
 ### 2.3 Token efficiency is a first-class concern
 
