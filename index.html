@@ -288,10 +288,12 @@
     <textarea id="validator-input" placeholder='{&#10;  "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",&#10;  "version": "0.2",&#10;  "name": "Your trip name",&#10;  "stops": [...],&#10;  "days": [...]&#10;}'></textarea>
     <div style="margin-top:12px;">
       <button class="btn btn-primary" id="validate-btn">Validate</button>
+      <button class="btn btn-secondary" id="render-btn">Render</button>
       <button class="btn btn-secondary" id="load-example-btn">Load example</button>
       <button class="btn btn-secondary" id="clear-btn">Clear</button>
     </div>
     <div class="result" id="result"></div>
+    <div class="visual-days" id="validator-render" style="margin-top: 16px;"></div>
   </div>
 </section>
 
@@ -490,8 +492,9 @@ document.querySelector('.example-toggle').addEventListener('click', (e) => {
 document.getElementById('example-code').textContent = JSON.stringify(examples.pch, null, 2);
 
 // ---- Visual renderer ----
-function renderVisual(data) {
-  const container = document.getElementById('visual-render');
+function renderVisual(data, targetId) {
+  const container = document.getElementById(targetId || 'visual-render');
+  if (!container) return;
   const stops = {};
   (data.stops || []).forEach(s => { stops[s.id] = s; });
   const routes = {};
@@ -540,14 +543,14 @@ function renderVisual(data) {
     if (item.type === 'flex') {
       const opts = (item.opts || []).map(o => renderItem(o)).join('');
       const pick = item.pick || 1;
-      return `<div class="visual-item flex">
-        <span style="font-size:0.9rem;flex-shrink:0">🔄</span>
-        <div class="item-body">
-          <span style="font-weight:600">Choose ${pick}</span>
-          <span class="flex-badge">pick ${pick}</span>
-        </div>
-        <div style="width:100%;margin-top:6px;padding-left:0">${opts}</div>
-      </div>`;
+      return '<div class="visual-item flex" style="display:block">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">' +
+        '<span style="font-size:0.9rem;flex-shrink:0">🔄</span>' +
+        '<div class="item-body"><span style="font-weight:600">Choose ' + pick + '</span></div>' +
+        '<span class="flex-badge">pick ' + pick + '</span>' +
+        '</div>' +
+        '<div style="padding-left:24px">' + opts + '</div>' +
+        '</div>';
     }
     return '';
   }
@@ -672,9 +675,30 @@ document.getElementById('load-example-btn').addEventListener('click', () => {
   document.getElementById('result').className = 'result';
 });
 
+document.getElementById('render-btn').addEventListener('click', () => {
+  const container = document.getElementById('validator-render');
+  const result = document.getElementById('result');
+  const input = document.getElementById('validator-input').value.trim();
+  if (!input) { result.className = 'result error'; result.innerHTML = 'Paste some JSON first.'; container.innerHTML = ''; return; }
+  let data;
+  try { data = JSON.parse(input); }
+  catch (e) { result.className = 'result error'; result.innerHTML = `Invalid JSON: ${e.message}`; container.innerHTML = ''; return; }
+  const errors = validate(data);
+  if (errors.length > 0) {
+    result.className = 'result error';
+    result.innerHTML = `<strong>${errors.length} issue(s):</strong><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+  } else {
+    result.className = 'result success';
+    result.innerHTML = '&#10003; Valid Open Itinerary v0.2 document.';
+  }
+  try { renderVisual(data, 'validator-render'); container.scrollIntoView({ behavior: 'smooth' }); }
+  catch (e) { container.innerHTML = `<p style="color:#991b1b">Render error: ${e.message}</p>`; }
+});
+
 document.getElementById('clear-btn').addEventListener('click', () => {
   document.getElementById('validator-input').value = '';
   document.getElementById('result').className = 'result';
+  document.getElementById('validator-render').innerHTML = '';
 });
 
 // ---- Copy buttons ----
