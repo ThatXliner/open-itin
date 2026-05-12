@@ -1,5 +1,5 @@
 {
-  "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+  "$schema": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",
   "version": "0.2",
   "name": "SF to LA Road Trip",
   "summary": "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1. Expect stunning cliff views, fresh seafood, and at least one stop that makes you consider moving there.",

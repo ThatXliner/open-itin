@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+  "$id": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",
   "title": "Open Itinerary",
   "description": "An open, token-efficient format for travel itineraries — designed for AI agents to output and apps to consume.",
   "type": "object",
@@ -10,7 +10,7 @@
     "$schema": {
       "type": "string",
       "description": "Must point to the Open Itinerary schema URI.",
-      "const": "https://openitinerary.org/schema/v0.2/itinerary.schema.json"
+      "const": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json"
     },
     "version": {
       "type": "string",

@@ -18,7 +18,7 @@ It is a published JSON Schema plus a `$schema` pointer in every document, and no
 
 ```json
 {
-  "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+  "$schema": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",
   "version": "0.2",
   "name": "SF to LA Road Trip",
   "summary": "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1.",
@@ -173,7 +173,7 @@ Drop the schema into your function calling definition or system prompt:
 
 ```
 Output the itinerary as a valid Open Itinerary JSON document conforming to:
-https://openitinerary.org/schema/v0.2/itinerary.schema.json
+https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json
 
 Rules:
 - Every stop must have an id, name, and goal

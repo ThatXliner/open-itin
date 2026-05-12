@@ -285,7 +285,7 @@
   <div class="container">
     <h2>Validator</h2>
     <p>Paste an Open Itinerary JSON below and validate it:</p>
-    <textarea id="validator-input" placeholder='{&#10;  "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",&#10;  "version": "0.2",&#10;  "name": "Your trip name",&#10;  "stops": [...],&#10;  "days": [...]&#10;}'></textarea>
+    <textarea id="validator-input" placeholder='{&#10;  "$schema": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",&#10;  "version": "0.2",&#10;  "name": "Your trip name",&#10;  "stops": [...],&#10;  "days": [...]&#10;}'></textarea>
     <div style="margin-top:12px;">
       <button class="btn btn-primary" id="validate-btn">Validate</button>
       <button class="btn btn-secondary" id="render-btn">Render</button>
@@ -307,12 +307,12 @@
 <script id="schema-data" type="application/json">
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+  "$id": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",
   "title": "Open Itinerary",
   "type": "object",
   "required": ["$schema", "version", "name", "stops", "days"],
   "properties": {
-    "$schema": { "type": "string", "const": "https://openitinerary.org/schema/v0.2/itinerary.schema.json" },
+    "$schema": { "type": "string", "const": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json" },
     "version": { "type": "string", "const": "0.2" },
     "name": { "type": "string" },
     "summary": { "type": "string" },
@@ -374,7 +374,7 @@ const modeIcons = {
 // ---- Example data (self-consistent — all refs resolve within the data) ----
 const examples = {
   pch: {
-    "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+    "$schema": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",
     "version": "0.2",
     "name": "SF to LA Road Trip",
     "summary": "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1.",
@@ -427,7 +427,7 @@ const examples = {
     "created_at": "2026-05-11T10:00:00Z"
   },
   tokyo: {
-    "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+    "$schema": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",
     "version": "0.2",
     "name": "Tokyo Weekend",
     "summary": "A 2-day sprint through Tokyo — Shibuya, Shinjuku, Asakusa, and Akihabara.",

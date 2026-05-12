@@ -1,5 +1,5 @@
 {
-  "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+  "$schema": "https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json",
   "version": "0.2",
   "name": "Tokyo Weekend",
   "summary": "A 2-day sprint through Tokyo — Shibuya, Shinjuku, Asakusa, and Akihabara. Temples in the morning, arcades at night, yakitori in between.",
