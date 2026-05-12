@@ -185,7 +185,7 @@
   <div class="container">
     <div class="badge">v0.2 alpha</div>
     <h1>Open Itinerary</h1>
-    <p class="subtitle">An open, token-efficient JSON format for travel plans — designed for AI agents to output and apps to consume.</p>
+    <p class="subtitle">An open, token-efficient JSON format for travel plans, designed for AI agents to output and apps to consume.</p>
     <div class="btn-group">
       <a href="https://github.com/ThatXliner/open-itin" class="btn btn-primary">GitHub</a>
       <a href="#validator" class="btn btn-secondary">Try the validator</a>
@@ -199,9 +199,9 @@
 <section>
   <div class="container">
     <h2>What it is</h2>
-    <p>A data model for travel plans, validated by a JSON Schema. No library, no SDK, no lock-in. Validate with any JSON Schema validator in any language.</p>
+    <p>A data model for travel plans, validated by a JSON Schema, with no library, no SDK, and no lock-in. Validate it with any JSON Schema validator in any language.</p>
     <p>Files use the extension <code>.oitinerary.json</code> and the MIME type <code>application/vnd.open-itinerary+json</code>.</p>
-    <p>It's to travel plans what iCalendar is to events &mdash; boring, useful, and open.</p>
+    <p>It's to travel plans what iCalendar is to events: boring, useful, and open.</p>
   </div>
 </section>
 
@@ -215,32 +215,32 @@
       <div class="card">
         <div class="icon">&#127919;</div>
         <h3>Every stop has a <code>goal</code></h3>
-        <p>Not just where you're going, but <em>why</em>. &ldquo;Scenic viewpoint &mdash; stretch and take photos.&rdquo; Forces AI agents to be explicit about intent.</p>
+        <p>A goal captures not just where you're going, but <em>why</em> you're going there, and a goal like &ldquo;Scenic viewpoint &mdash; stretch and take photos&rdquo; forces AI agents to be explicit about intent.</p>
       </div>
       <div class="card">
         <div class="icon">&#128205;</div>
         <h3>Coords are a cache, not truth</h3>
-        <p>AI agents hallucinate lat/lng. The <code>name</code> (and <code>addr</code>) is authoritative. Coordinates are added by a geocoder post-generation.</p>
+        <p>AI agents hallucinate lat/lng, so the <code>name</code> (and <code>addr</code>) is authoritative; coordinates are added by a geocoder post-generation.</p>
       </div>
       <div class="card">
         <div class="icon">⚡</div>
         <h3>Token-efficient by design</h3>
-        <p><code>tz</code> not <code>timezone</code>. <code>dur</code> not <code>durationMinutes</code>. <code>cat</code> not <code>category</code>. Save 25&ndash;35% output tokens vs verbose JSON.</p>
+        <p>Abbreviated keys like <code>tz</code>, <code>dur</code>, and <code>cat</code> save 25&ndash;35% output tokens versus verbose JSON.</p>
       </div>
       <div class="card">
         <div class="icon">&#128196;</div>
         <h3>Flat catalogs, not deep nesting</h3>
-        <p>Stops and routes are top-level, referenced by <code>id</code> from each day. No duplication when a stop appears in multiple days.</p>
+        <p>Stops and routes are top-level, referenced by <code>id</code> from each day, so there is no duplication when a stop appears in multiple days.</p>
       </div>
       <div class="card">
         <div class="icon">&#128257;</div>
         <h3>Alternatives are first-class</h3>
-        <p>Stop-level <code>alts</code> for &ldquo;instead of this restaurant, try that one.&rdquo; Day-level <code>flex</code> for &ldquo;choose N of these options.&rdquo;</p>
+        <p>Stop-level <code>alts</code> suggest replacements (&ldquo;instead of this restaurant, try that one&rdquo;), and day-level <code>flex</code> blocks let you choose among options (&ldquo;choose N of these&rdquo;).</p>
       </div>
       <div class="card">
         <div class="icon">&#9201;</div>
         <h3>Duration ranges, not fixed times</h3>
-        <p><code>dur: {min: 1.5, max: 2.5}</code> acknowledges that travel is uncertain. Fixed times only when they matter (flights, reservations).</p>
+        <p><code>dur: {min: 1.5, max: 2.5}</code> acknowledges that travel is uncertain, and fixed times are reserved for when they truly matter (flights, reservations).</p>
       </div>
     </div>
   </div>
