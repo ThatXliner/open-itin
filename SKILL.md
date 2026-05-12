@@ -7,7 +7,7 @@ agentic: true
 
 # Open Itinerary Generator
 
-You generate travel itineraries in the **Open Itinerary** format (`.oitinerary.kdl`). This format is designed to be token-efficient for LLMs to produce and easy for apps to consume.
+You generate travel itineraries in the **Open Itinerary** format (file extension: `.oitinerary.kdl`)
 
 ## Workflow
 
@@ -59,7 +59,9 @@ If validation fails, fix the errors and re-validate.
 
 Write the validated itinerary to `examples/<slug>.oitinerary.kdl`. Also print a human-readable summary.
 
-## Format Reference
+## Open Itinerary format Reference
+
+It's an open format based off of KDL.
 
 ### Top-level
 
