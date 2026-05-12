@@ -1,22 +1,18 @@
 # Open Itinerary
 
-**An open, token-efficient JSON format for travel itineraries — designed for AI agents to output and apps to consume.**
+**An open, token-efficient JSON format for travel itineraries, designed for AI agents to output and apps to consume.**
 
 ---
 
 ## The problem
 
-Ask five AI agents to plan a road trip. Get five completely different JSON shapes — or worse, prose. There's no standard for what a "stop" is, how alternatives are represented, or how to hand an itinerary off from one app to another without writing a custom parser.
-
-Existing formats don't help: Schema.org's `Trip` is too abstract for real itineraries, iCalendar wasn't designed for planning, and GTFS is transit-specific.
-
-Open Itinerary is to travel plans what iCalendar is to events: boring, useful, and open.
+Ask five AI agents to plan a road trip and you get five completely different JSON shapes, or worse, prose. There is no standard for what a "stop" is, how alternatives are represented, or how to hand an itinerary off from one app to another without writing a custom parser. Existing formats do not help: Schema.org's `Trip` is too abstract for real itineraries, iCalendar was not designed for planning, and GTFS is transit-specific. Open Itinerary aims to be for travel plans what iCalendar is for events: boring, useful, and open.
 
 ---
 
 ## What it is
 
-A published JSON Schema + a `$schema` pointer in every document. That's it.
+It is a published JSON Schema plus a `$schema` pointer in every document, and nothing more.
 
 **The format IS the schema.** Validate with any JSON Schema validator in any language. Files use the extension `.oitinerary.json` and the MIME type `application/vnd.open-itinerary+json`.
 
@@ -100,7 +96,7 @@ After running the geocoder, coordinates are added automatically:
 
 ## Key design decisions
 
-**`name` is truth, `coords` is a cache.** AI agents hallucinate coordinates — they'll confidently emit a lat/lng that's in the right region but wrong by kilometers. The schema makes `name` (and optionally `addr`) the authoritative location identifier. Coordinates live in a `coords` sub-object that is always produced by a geocoder, never by an agent. If the name changes, discard `coords` and re-geocode.
+**`name` is truth, `coords` is a cache.** AI agents hallucinate coordinates; they will confidently emit a latitude and longitude that is in the right region but wrong by kilometers. The schema makes `name` (and optionally `addr`) the authoritative location identifier. Coordinates live in a `coords` sub-object that is always produced by a geocoder, never by an agent. If the name changes, discard `coords` and re-geocode.
 
 **Every stop has a `goal`.** The single most important field. It answers *why* you're stopping, not just *where*. This forces AI agents to be explicit about intent and gives consuming apps a human-readable string that works without further parsing.
 
@@ -108,11 +104,11 @@ After running the geocoder, coordinates are added automatically:
 
 **Flat structure with references.** Stops and routes live in top-level catalogs, referenced by `id` from each day. This avoids duplicating stop details and LLMs handle flat references better than deeply nested JSON.
 
-**Alternatives are first-class.** Real travel involves choices. Stops have an `alts` array for "instead of this, consider that." Days have `flex` blocks for "choose N of these" — the decision isn't made yet.
+**Alternatives are first-class.** Real travel involves choices. Stops have an `alts` array for "instead of this, consider that." Days have `flex` blocks for "choose N of these," and the decision is not made yet.
 
-**Days are explicit containers with ordered items.** Not just a `day` number on each stop — days contain an ordered sequence of stops, routes, notes, and flex blocks. This preserves intra-day order and lets apps render a precise timeline.
+**Days are explicit containers with ordered items.** Rather than just a `day` number on each stop, days contain an ordered sequence of stops, routes, notes, and flex blocks. This preserves intra-day order and lets apps render a precise timeline.
 
-**Duration ranges, not fixed times.** `dur: {min: 1.5, max: 2.5}` acknowledges that travel durations are estimates. Exact departure/arrival times are optional (`dep`, `arr`) for when they matter (flights, reservations).
+**Duration ranges, not fixed times.** `dur: {min: 1.5, max: 2.5}` acknowledges that travel durations are estimates, and exact departure and arrival times are optional (`dep`, `arr`) for when they matter, such as flights or reservations.
 
 ---
 
@@ -212,7 +208,7 @@ See [examples/sf-to-la.json](./examples/sf-to-la.json) (3-day California road tr
 
 ## Geocoder
 
-`geocode.py` reads a `.oitinerary.json` file, queries Nominatim (OpenStreetMap) for every stop and alternative, and writes coordinates into `location.coords`. It unconditionally overwrites any existing coords — `name` is always truth.
+`geocode.py` reads a `.oitinerary.json` file, queries Nominatim (OpenStreetMap) for every stop and alternative, and writes coordinates into `location.coords`. It unconditionally overwrites any existing coords, because `name` is always truth.
 
 ```bash
 python geocode.py my-trip.json
@@ -225,13 +221,13 @@ Nominatim is free and requires no API key. The script enforces a 1.2s rate limit
 
 ## What's out of scope for v0.2
 
-Turn-by-turn routing, real-time status, booking data, split payments, multi-traveler fields, accessibility metadata. These may appear in future versions or optional extension namespaces.
+Turn-by-turn routing, real-time status, booking data, split payments, multi-traveler fields, and accessibility metadata are all out of scope for v0.2; they may appear in future versions or optional extension namespaces.
 
 ---
 
 ## Future
 
-- **Phase 2: Agent-optimized format** — a line-delimited, indentation-based serialization that maps 1:1 to the schema but strips JSON's syntactic overhead (braces, quotes, commas). See [notes/agent-optimized-format.md](./notes/agent-optimized-format.md).
+- **Phase 2: Agent-optimized format**, a line-delimited, indentation-based serialization that maps 1:1 to the schema but strips JSON's syntactic overhead (braces, quotes, commas). See [notes/agent-optimized-format.md](./notes/agent-optimized-format.md).
 - Reference parser libraries (Python, TypeScript, Go)
 - Export adapters (Google Maps, Apple Maps, iCalendar, GPX)
 - `openitinerary.org` with schema hosting and docs
@@ -240,7 +236,7 @@ Turn-by-turn routing, real-time status, booking data, split payments, multi-trav
 
 ## Status
 
-**v0.2 alpha.** Breaking changes will increment the minor version. The `$schema` URI pins the version so consuming apps can detect and handle changes.
+**v0.2 alpha.** Breaking changes will increment the minor version, and the `$schema` URI pins the version so that consuming apps can detect and handle those changes.
 
 ## License
 
