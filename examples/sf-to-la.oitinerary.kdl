@@ -1,0 +1,181 @@
+itinerary "SF to LA Road Trip" {
+  summary "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1. Expect stunning cliff views, fresh seafood, and at least one stop that makes you consider moving there."
+  tz "America/Los_Angeles"
+  cur "USD"
+  tags "road-trip, coastal, california, scenic"
+  generated_by "claude-sonnet-4"
+  created_at "2026-05-11T10:00:00Z"
+  stop "sf" {
+  name "San Francisco"
+  goal "Start the trip — fuel up and hit the coast"
+  cat "other"
+  addr "San Francisco, CA 94102"
+  }
+  stop "monterey" {
+  name "Monterey Bay Aquarium"
+  goal "See the sea otters and the kelp forest — one of the best aquariums in the world"
+  cat "attraction"
+  addr "886 Cannery Row, Monterey, CA 93940"
+    dur min=1.5 max=2.5
+    cost amt=65
+  url "https://www.montereybayaquarium.org"
+  note "Book online to skip the line. The Open Sea exhibit is unmissable."
+    alt {
+    name "Monterey State Beach"
+    goal "Skip the aquarium and walk the beach instead — free and just as memorable"
+    cat "nature"
+    }
+    alt {
+    name "Cannery Row"
+    goal "Walk Cannery Row for shops and people-watching instead of the aquarium"
+    cat "shopping"
+    dur min=1 max=2
+    }
+  }
+  stop "big-sur-inn" {
+  name "Big Sur River Inn"
+  goal "Overnight stay — creekside rooms in the heart of Big Sur"
+  cat "accommodation"
+  addr "46800 CA-1, Big Sur, CA 93920"
+    cost amt=280
+  url "https://www.bigsurriverinn.com"
+  note "Book a creekside room. Restaurant on site — the apple pie is famous."
+  }
+  stop "mcway-falls" {
+  name "McWay Falls"
+  goal "Quick photo stop — waterfall dropping onto a secluded beach"
+  cat "viewpoint"
+  addr "Julia Pfeiffer Burns State Park, CA-1, Big Sur, CA 93920"
+    dur min=0.25 max=0.75
+  note "Easy overlook trail, no hiking required. Morning light is best for photos."
+  }
+  stop "hearst-castle" {
+  name "Hearst Castle"
+  goal "Tour the most absurd private home in American history"
+  cat "attraction"
+  addr "750 Hearst Castle Rd, San Simeon, CA 93452"
+    dur min=2 max=4
+    cost amt=30
+  url "https://hearstcastle.org"
+  note "Book the Grand Rooms tour in advance — it's the best first-timer option."
+  }
+  stop "solvang" {
+  name "Solvang"
+  goal "Stretch and grab a Danish pastry in a surreal Danish-themed town"
+  cat "food"
+  addr "Solvang, CA 93463"
+    dur min=1 max=2
+  note "Try Olsen's Danish Village Bakery. The æbleskiver (pancake balls) are the move."
+  }
+  stop "santa-barbara-inn" {
+  name "Santa Barbara Inn"
+  goal "Overnight stay with ocean views in Santa Barbara"
+  cat "accommodation"
+  addr "901 E Cabrillo Blvd, Santa Barbara, CA 93103"
+    cost amt=350
+  note "Ocean view rooms are worth the upgrade. Walk to the Funk Zone for wine tasting."
+  }
+  stop "santa-barbara-pier" {
+  name "Stearns Wharf"
+  goal "Walk the pier — fresh seafood and ocean views"
+  cat "attraction"
+  addr "217 Stearns Wharf, Santa Barbara, CA 93101"
+    dur min=0.5 max=1.5
+  }
+  stop "santa-monica" {
+  name "Santa Monica Pier"
+  goal "End of the road — touch the Route 66 sign, get the photo, call it done"
+  cat "attraction"
+  addr "200 Santa Monica Pier, Santa Monica, CA 90401"
+    dur min=0.5 max=2
+  note "You made it. The pier is touristy but the symbolism is real. Sunset here is a solid finish."
+  }
+  stop "la-hotel" {
+  name "Hotel in Downtown LA"
+  goal "Final overnight — rest up before the real world resumes"
+  cat "accommodation"
+  addr "Los Angeles, CA 90012"
+  }
+  route "sf-to-monterey" {
+  from "sf"
+  to "monterey"
+  mode "drive"
+    dur min=1.75 max=2.5
+    dist 180
+  note "Take I-280 S to CA-1 S. Scenic but slower — budget extra time for photo pullouts."
+  }
+  route "monterey-to-bigsur" {
+  from "monterey"
+  to "big-sur-inn"
+  mode "drive"
+    dur min=0.5 max=1
+    dist 55
+  note "CA-1 S. Bixby Bridge is a must-stop photo op — pullout on the north side."
+  }
+  route "bigsur-to-hearst" {
+  from "big-sur-inn"
+  to "hearst-castle"
+  mode "drive"
+    dur min=1.25 max=2
+    dist 100
+  note "Stop at McWay Falls on the way. Check Caltrans for CA-1 closures before this leg — washouts are common."
+  }
+  route "hearst-to-solvang" {
+  from "hearst-castle"
+  to "solvang"
+  mode "drive"
+    dur min=1 max=1.5
+    dist 110
+  note "Elephant seal rookery at Piedras Blancas is worth a 10-min stop just north of Hearst Castle."
+  }
+  route "solvang-to-sb" {
+  from "solvang"
+  to "santa-barbara-inn"
+  mode "drive"
+    dur min=0.5 max=1
+    dist 55
+  note "CA-154 for mountain views, or US-101 for speed. Take 154 if the weather is clear."
+  }
+  route "sb-to-la" {
+  from "santa-barbara-inn"
+  to "santa-monica"
+  mode "drive"
+    dur min=1.5 max=3
+    dist 150
+  note "US-101 S to I-405 S. Traffic builds hard after 3pm — leave Santa Barbara by noon if you can."
+  }
+  day date="2026-06-15" {
+  note "SF to Big Sur — the best stretch of coastline in California"
+    item type="stop" ref="sf"
+    item type="route" ref="sf-to-monterey"
+    item type="stop" ref="monterey"
+    item type="note" txt="Grab lunch on Cannery Row — the clam chowder in a sourdough bowl is not a cliché, it's just correct"
+    item type="route" ref="monterey-to-bigsur"
+    item type="stop" ref="big-sur-inn"
+  }
+  day date="2026-06-16" {
+  note "Big Sur to Santa Barbara — castles, Danish towns, and ocean views"
+    item type="stop" ref="mcway-falls"
+    item type="route" ref="bigsur-to-hearst"
+    item type="stop" ref="hearst-castle"
+    item type="route" ref="hearst-to-solvang"
+    item type="stop" ref="solvang"
+    item type="route" ref="solvang-to-sb"
+    item type="stop" ref="santa-barbara-inn"
+    flex pick=1 {
+      option type="stop" ref="santa-barbara-pier"
+      option type="note" txt="Walk State Street for shopping and wine tasting in the Funk Zone"
+    }
+  }
+  day date="2026-06-17" {
+  note "Santa Barbara to LA — final stretch"
+    item type="route" ref="sb-to-la"
+    item type="stop" ref="santa-monica"
+    flex pick=1 {
+      option type="note" txt="Dinner in Venice Beach — try Gjelina on Abbot Kinney"
+      option type="note" txt="Dinner in Santa Monica — try Cassia for Southeast Asian"
+      option type="note" txt="Head to Koreatown for Korean BBQ — Park's BBQ if you want the best"
+    }
+    item type="stop" ref="la-hotel"
+  }
+}

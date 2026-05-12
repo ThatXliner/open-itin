@@ -1,0 +1,19 @@
+{
+  "name": "open-itin-agent-format",
+  "version": "0.1.0",
+  "description": "Token-optimized format for Open Itinerary — parser, serializer, and JSON converter",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "js-tiktoken": "^1.0.16",
+    "kdljs": "^0.3.0"
+  }
+}
