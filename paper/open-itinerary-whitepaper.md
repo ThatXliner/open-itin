@@ -211,24 +211,49 @@ This allows apps with access to a specific mapping provider to resolve locations
 
 ## 5. Token Efficiency Analysis
 
-We compared four representations of the same 3-day road trip (San Francisco to Los Angeles, 5 stops, 2 routes, 3 days) using OpenAI's `cl100k_base` tokenizer:
+We measured actual token counts using the `cl100k_base` tokenizer (OpenAI's encoding) on the two reference examples included with the spec:
 
-| Format | Tokens | vs. Plain English |
-|--------|--------|-------------------|
-| Plain English (typical AI output) | 234 | 1.00× (baseline) |
-| Open Itinerary v0.2 (JSON) | 846 | 3.62× |
-| Open Itinerary as YAML | 761 | 3.25× |
-| Agent-optimized format (Phase 2) | 501 | 2.14× |
+| Example | JSON | KDL | Output savings |
+|---------|------|-----|----------------|
+| SF to LA Road Trip (3 days, 10 stops, 6 routes) | 2,653 | 1,936 | 27.0% |
+| Tokyo Weekend (2 days, 17 stops, 11 routes) | 4,605 | 3,521 | 23.5% |
 
-### 5.1 Interpretation
+### 5.1 Where the savings come from
 
-Plain English is the most token-efficient format—and the least structured. A human can read it, but an app cannot parse it reliably. Every tool consuming plain English itineraries must run an LLM to extract entities, adding latency, cost, and error.
+KDL uses key=value properties (`dur min=1.5 max=2.5`) and positional values (`coord 37.8 -122.5`) instead of quoted key-value pairs and nested objects. It also eliminates array brackets for repeated child nodes—each `stop`, `route`, and `day` is just a named block.
 
-Structured JSON costs 3.6× more tokens than plain English. This is the price of machine readability: every field name gets quoted, every object gets braces, every array gets brackets. The YAML variant saves about 10% over JSON by eliminating some delimiters but retains the same field names.
+### 5.2 Instruction tokens
 
-The agent-optimized format (Phase 2) cuts the overhead nearly in half: 2.1× baseline versus JSON's 3.6×. It achieves this by eliminating quotes around keys, using indentation instead of braces, and employing positional fields (`coord 37.8 -122.5` instead of `{"lat": 37.8, "lng": -122.5}`).
+A fair comparison includes the tokens needed to tell an LLM what to output:
 
-The key insight: **structure costs tokens, but the cost can be reduced**. At scale—millions of itinerary generations—the difference between 846 and 501 tokens per output is meaningful in both cost and latency.
+| | JSON Schema | KDL schema |
+|---|------------|------------|
+| Instruction tokens | 3,326 | 737 |
+| Output tokens (SF to LA) | 2,653 | 1,936 |
+| **Total** | **5,979** | **2,673** |
+
+The KDL schema reference is 78% smaller than the JSON Schema (737 vs 3,326 tokens) because it describes the Open Itinerary structure without the overhead of JSON Schema's meta-schema (every property wrapped in `"type": "object"`, `"properties": {...}`, etc.). Combined with output savings, the total token reduction is 55%.
+
+### 5.3 Why KDL instead of a custom format
+
+An earlier prototype used a custom indentation-based format with implicit fields (the first indented line after `stop <id>` was the name). This achieved deeper token savings (~40% vs JSON) but introduced parsing ambiguity: a stop named "goal Setting Workshop" would be misinterpreted as a `goal` field. KDL avoids this because:
+
+1. **Existing standard** — spec at kdl.dev, parsers in JS, Rust, Python, Go. No custom parser to maintain or explain.
+2. **No ambiguity** — string values are quoted, properties use `=`, children use `{}`. Nothing is implicit.
+3. **LLM-friendly** — KDL's syntax is small enough to include in a system prompt (737 tokens). LLMs can learn it once.
+4. **Battle-tested parsers** — the `kdljs` library handles edge cases (escaping, whitespace, comments) that a custom parser would need to discover over time.
+
+The tradeoff: KDL requires quoted strings and `{}` braces, costing ~13% more output tokens than a purpose-built format. But those tokens buy a formal spec, existing tooling, and zero-maintenance parsing. For a v0.2 format, that's the right trade.
+
+### 5.4 Recommendation
+
+For single itineraries: generate JSON (LLMs have strong JSON priors), then optionally convert to KDL for compact storage. For bulk generation at scale: include the KDL schema in the system prompt and generate KDL directly. The 737-token schema reference pays for itself after ~3 itineraries versus generating JSON with the full JSON Schema in the prompt.
+
+The reference implementation at `agent-format/` provides: `parse()` (KDL → typed object), `format()` (typed object → KDL), `toJSON()` (KDL → JSON), and `fromJSON()` (JSON → KDL).
+
+### 5.5 Key insight
+
+KDL gives us most of the token savings of a custom format with none of the maintenance burden. The format preserves every field, constraint, and relationship from the JSON schema. When the instruction tokens are included, switching from JSON Schema + JSON output to KDL schema + KDL output reduces total token consumption by 55%.
 
 ---
 
@@ -297,9 +322,9 @@ Several domains are explicitly out of scope for v0.2 but could be added as optio
 
 ## 8. Future Work
 
-### 8.1 Agent-optimized format (Phase 2)
+### 8.1 KDL agent format (Phase 2)
 
-JSON is universal but verbose. A custom line-delimited, indentation-based format could reduce token counts by ~40% versus JSON while maintaining the same structural guarantees. See `notes/agent-optimized-format.md` for a detailed sketch. The JSON Schema remains the canonical spec; the custom format is a serialization alternative.
+The KDL serialization format is now implemented, providing ~27% output token savings over JSON and 55% total savings (instruction + output). See §5 for the full token analysis. The reference implementation in `agent-format/` provides a parser, formatter, and bidirectional JSON converter using the `kdljs` library.
 
 ### 8.2 Reference libraries
 
