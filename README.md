@@ -12,9 +12,7 @@ Ask five AI agents to plan a road trip and you get five completely different JSO
 
 ## What it is
 
-It is a published JSON Schema plus a `$schema` pointer in every document, and nothing more.
-
-**The format IS the schema.** Validate with any JSON Schema validator in any language. Files use the extension `.oitinerary.json` and the MIME type `application/vnd.open-itinerary+json`.
+It is a data model for travel plans, validated by a JSON Schema. Validate with any JSON Schema validator in any language. Files use the extension `.oitinerary.json` and the MIME type `application/vnd.open-itinerary+json`.
 
 ```json
 {

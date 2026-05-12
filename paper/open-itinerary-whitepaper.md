@@ -29,13 +29,21 @@ Open Itinerary is designed for a specific job: be the thing AI agents output, an
 
 ## 2. Design Principles
 
-### 2.1 The format IS the schema
+### 2.1 Explicit intent via `goal`
 
-There is no separate specification document. The JSON Schema *is* the specification. Field descriptions, constraints, and examples live in the schema itself via `$comment` and `description`. Any JSON Schema validator in any language can validate an Open Itinerary document. This means adoption requires nothing more than pointing a validator at the schema URI.
+Every stop in an Open Itinerary must declare *why* you're going there. This is the `goal` field—a short, human-readable phrase like "See the sea otters and kelp forest" or "Overnight stay—creekside rooms in the heart of Big Sur." It is the single most important design decision in the format and serves three purposes:
+
+1. **For AI agents**: It acts as a forcing function. The model must articulate intent, which improves the quality of the generated itinerary—you can't just list places, you have to say why each one matters.
+2. **For consuming apps**: It provides a display-ready purpose string that works without further parsing. A map view can show the goal as a subtitle. A timeline can display it as the primary description.
+3. **For travelers**: It communicates what matters about each stop. A traveler reading the itinerary can decide whether a stop aligns with their interests without researching it externally.
+
+### 2.2 Specification
+
+The data model is defined by a JSON Schema. Field descriptions, constraints, and examples live in the schema itself. Any JSON Schema validator in any language can validate an Open Itinerary document—adoption requires nothing more than pointing a validator at the schema URI.
 
 Every document declares `"$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json"` and `"version": "0.2"`. The pinned URI ensures consuming apps can detect version changes and handle them explicitly.
 
-### 2.2 Token efficiency is a first-class concern
+### 2.3 Token efficiency is a first-class concern
 
 When an AI agent outputs JSON, every character is a token that costs money. Field name length alone can add 25–35% to the output token count when comparing Open Itinerary's short names to typical verbose alternatives:
 
@@ -54,7 +62,7 @@ When an AI agent outputs JSON, every character is a token that costs money. Fiel
 
 The overall field name savings is approximately 18% (37 vs 45 tokens for the same set of 12 field names, counted with OpenAI's `cl100k_base` tokenizer). The structural savings—flat catalogs instead of deep nesting, references instead of duplication—compound this.
 
-### 2.3 Flat catalogs over deep nesting
+### 2.4 Flat catalogs over deep nesting
 
 Stops and routes live in top-level arrays (`stops`, `routes`) and are referenced by `id` from each day's `items`. This has three benefits:
 
@@ -62,7 +70,7 @@ Stops and routes live in top-level arrays (`stops`, `routes`) and are referenced
 2. **Better LLM output**: Language models handle flat lists of typed objects more reliably than deeply nested JSON. Each stop is a self-contained block with all its fields at one level.
 3. **Smaller payloads**: Referencing `{"type": "stop", "ref": "hotel-shibuya"}` costs ~10 tokens versus repeating the full stop definition (~50+ tokens).
 
-### 2.4 Addresses over coordinates
+### 2.5 Addresses over coordinates
 
 Language models do not have a geospatial model. They cannot compute coordinates. When asked for lat/lng, they confidently emit numbers that are in the right region but wrong by kilometers—a silent failure mode that is hard to detect without plotting every point on a map.
 
@@ -81,25 +89,10 @@ A companion Python script (`geocode.py`) processes any `.oitinerary.json` file t
 
 If the name or address changes, the coordinates are discarded and re-geocoded. The `source` field and `geocoded_at` timestamp make cache invalidation explicit.
 
-### 2.5 Duration ranges over fixed times
+### 2.6 Duration ranges over fixed times
 
 Travel is uncertain. Traffic varies. A museum might be more interesting than expected. Open Itinerary uses duration ranges (`dur: {min: 1.5, max: 2.5}`, in hours) rather than fixed start/end times. This acknowledges that most itinerary items are flexible. Fixed departure and arrival times (`dep`, `arr`, as ISO 8601 strings) are available for the cases where they matter: flights, train departures, dinner reservations.
 
-### 2.6 Every stop has a goal
-
-The `goal` field is the single most important design decision in Open Itinerary. It answers *why* you're stopping, not just *where*. Examples:
-
-- "See the sea otters and kelp forest—one of the best aquariums in the world"
-- "End of the road—touch the Route 66 sign, get the photo, call it done"
-- "Overnight stay—creekside rooms in the heart of Big Sur"
-
-The `goal` field serves three purposes:
-
-1. **For AI agents**: It acts as a forcing function. The model must articulate intent, which improves the quality of the generated itinerary (you can't just list places—you have to say why each one matters).
-2. **For consuming apps**: It provides a human-readable purpose string that works without further parsing. A map view can show the goal as a subtitle. A timeline can display it as the primary description.
-3. **For travelers**: It communicates what matters about each stop. A traveler reading the itinerary can decide whether a stop aligns with their interests without researching it externally.
-
----
 
 ## 3. Entity Model
 
