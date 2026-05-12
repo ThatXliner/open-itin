@@ -12,7 +12,60 @@ Ask five AI agents to plan a road trip and you get five completely different JSO
 
 ## What it is
 
-It is a data model for travel plans, validated by a JSON Schema. Validate with any JSON Schema validator in any language. Files use the extension `.oitinerary.json` and the MIME type `application/vnd.open-itinerary+json`.
+It is a data model for travel plans, with two equivalent serializations:
+
+- **`.oitinerary.kdl`** — a token-efficient KDL format designed for AI agents to output. 60-80% fewer tokens than JSON.
+- **`.oitinerary.json`** — JSON, validated by [JSON Schema](https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json), MIME `application/vnd.open-itinerary+json`. Use this for app consumption and validation.
+
+Convert between them with the CLI:
+
+```bash
+cd agent-format
+bun run src/cli.ts to-json examples/sf-to-la.oitinerary.kdl   # KDL → JSON
+bun run src/cli.ts from-json trip.json                         # JSON → KDL
+```
+
+### Agent format (KDL)
+
+```
+itinerary "SF to LA Road Trip" {
+  summary "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1."
+  tz "America/Los_Angeles"
+  cur "USD"
+  tags "road-trip, coastal, california"
+  generated_by "claude-sonnet-4"
+  created_at "2026-05-11T10:00:00Z"
+  stop "monterey" {
+    name "Monterey Bay Aquarium"
+    goal "See the sea otters and kelp forest"
+    cat "attraction"
+    addr "886 Cannery Row, Monterey, CA 93940"
+    dur min=1.5 max=2.5
+    cost amt=65
+    alt {
+      name "Monterey State Beach"
+      goal "Free alternative — walk the beach instead"
+      cat "nature"
+    }
+  }
+  route "sf-to-monterey" {
+    from "sf"
+    to "monterey"
+    mode "drive"
+    dur min=1.75 max=2.5
+    dist 180
+  }
+  day date="2026-06-15" {
+    item type="stop" ref="monterey"
+    flex pick=1 {
+      option type="stop" ref="beach"
+      option type="note" txt="Relax at the hotel pool"
+    }
+  }
+}
+```
+
+### JSON format
 
 ```json
 {
@@ -142,7 +195,19 @@ After running the geocoder, coordinates are added automatically:
 
 ## Quick start
 
-### Validate an itinerary
+### Parse and convert
+
+```bash
+cd agent-format
+bun install
+bun run src/cli.ts parse examples/sf-to-la.oitinerary.kdl   # parse KDL → AST
+bun run src/cli.ts to-json examples/sf-to-la.oitinerary.kdl  # KDL → JSON
+bun run src/cli.ts from-json trip.json                       # JSON → KDL
+bun run src/cli.ts tokens examples/sf-to-la.oitinerary.kdl   # compare token counts
+bun run src/cli.ts validate examples/sf-to-la.oitinerary.kdl # validate
+```
+
+### Validate JSON
 
 ```bash
 # Using Python
@@ -167,7 +232,9 @@ python geocode.py your-trip.json --dry-run  # preview only
 
 ### For AI tool developers
 
-Drop the schema into your function calling definition or system prompt:
+Use the KDL format for agent output — it's 60-80% more token-efficient than JSON and maps 1:1 to the data model. See [oitinerary.md](./oitinerary.md) for an example Claude Code agent skill that parallelizes itinerary generation across sub-agents.
+
+To use the JSON format, drop the schema into your function calling definition or system prompt:
 
 ```
 Output the itinerary as a valid Open Itinerary JSON document conforming to:
@@ -182,13 +249,15 @@ Rules:
 - Output only the JSON — no prose, no markdown fences
 ```
 
+An [example Claude Code agent skill](./oitinerary.md) shows how to parallelize itinerary generation across sub-agents: research stops, routes, and day plans concurrently, then assemble and validate the output.
+
 ### For app developers
 
 Accept an Open Itinerary JSON as input. Parse it like any other JSON. The schema guarantees well-formed data. Geocode `addr` to get display coordinates. Render `days[].items` in order for a timeline view.
 
 ### For everyone else
 
-See [examples/sf-to-la.json](./examples/sf-to-la.json) (3-day California road trip) and [examples/tokyo-weekend.json](./examples/tokyo-weekend.json) (2-day Tokyo sprint).
+See [examples/sf-to-la.oitinerary.kdl](./examples/sf-to-la.oitinerary.kdl) (3-day California road trip) and [examples/tokyo-weekend.oitinerary.kdl](./examples/tokyo-weekend.oitinerary.kdl) (2-day Tokyo sprint).
 
 ---
 
@@ -225,7 +294,6 @@ Turn-by-turn routing, real-time status, booking data, split payments, multi-trav
 
 ## Future
 
-- **Phase 2: Agent-optimized format**, a line-delimited, indentation-based serialization that maps 1:1 to the schema but strips JSON's syntactic overhead (braces, quotes, commas). See [notes/agent-optimized-format.md](./notes/agent-optimized-format.md).
 - Reference parser libraries (Python, TypeScript, Go)
 - Export adapters (Google Maps, Apple Maps, iCalendar, GPX)
 - `openitinerary.org` with schema hosting and docs
