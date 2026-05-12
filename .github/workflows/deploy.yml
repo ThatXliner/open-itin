@@ -1,0 +1,79 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install jsonschema
+
+      - name: Validate schema
+        run: |
+          python -c "
+          import json, jsonschema
+          with open('open-itin.schema.json') as f:
+              schema = json.load(f)
+          jsonschema.Draft202012Validator.check_schema(schema)
+          print('Schema OK')
+          "
+
+      - name: Validate and render examples
+        run: |
+          python -c "
+          import json, jsonschema, glob
+          with open('open-itin.schema.json') as f:
+              schema = json.load(f)
+          for path in sorted(glob.glob('examples/*.json')):
+              with open(path) as f:
+                  data = json.load(f)
+              jsonschema.validate(data, schema)
+              name = data.get('name', path)
+              days = len(data.get('days', []))
+              stops = len(data.get('stops', []))
+              print(f'  OK {path}: \"{name}\" ({days} days, {stops} stops)')
+          print('All examples valid and rendered')
+          "
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Build site
+        run: |
+          mkdir _site
+          cp index.html _site/
+          cp open-itin.schema.json _site/
+          cp -r examples _site/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,110 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install jsonschema
+
+      - name: Validate schema
+        run: |
+          python -c "
+          import json, jsonschema
+          with open('open-itin.schema.json') as f:
+              schema = json.load(f)
+          jsonschema.Draft202012Validator.check_schema(schema)
+          print('Schema is valid JSON Schema (draft 2020-12)')
+          "
+
+      - name: Validate and render examples
+        run: |
+          python -c "
+          import json, jsonschema, glob, re
+
+          with open('open-itin.schema.json') as f:
+              schema = json.load(f)
+
+          for path in sorted(glob.glob('examples/*.json')):
+              with open(path) as f:
+                  data = json.load(f)
+
+              # Validate
+              jsonschema.validate(data, schema)
+
+              # Build stop/route lookup
+              stops = {s['id']: s for s in data.get('stops', [])}
+              routes = {r['id']: r for r in data.get('routes', [])}
+
+              def dur_str(d):
+                  if not d: return ''
+                  mn, mx = d.get('min'), d.get('max')
+                  if mn and mx and mn != mx: return f' ({mn}h–{mx}h)'
+                  if mn: return f' ({mn}h)'
+                  return ''
+
+              # Render
+              print(f'\n{'='*60}')
+              print(f'  {data['name']}')
+              print(f'  {data.get('summary', '')}')
+              print(f'  Timezone: {data.get('tz', '-')}  Currency: {data.get('cur', '-')}')
+              print(f'  {len(stops)} stops, {len(routes)} routes, {len(data.get('days', []))} days')
+              print(f'{'='*60}')
+
+              for i, day in enumerate(data.get('days', [])):
+                  print(f'\n  Day {i+1} — {day.get('date', '?')}')
+                  if day.get('note'):
+                      print(f'  {day['note']}')
+                  print(f'  {'-'*50}')
+
+                  for item in day.get('items', []):
+                      if item['type'] == 'note':
+                          print(f'    📝 {item['txt']}')
+                      elif item['type'] == 'stop':
+                          s = stops.get(item.get('ref', ''), {})
+                          cat_icon = {'accommodation':'🏨','food':'🍽','drink':'🍸','attraction':'📍','nature':'🌿','viewpoint':'📷','transport':'🚉','rest':'😴','shopping':'🛍','activity':'🎯'}.get(s.get('cat',''), '•')
+                          print(f'    {cat_icon} {s.get('name','?')} — {s.get('goal','?')}{dur_str(s.get('dur'))}')
+                      elif item['type'] == 'route':
+                          r = routes.get(item.get('ref', ''), {})
+                          mode_icon = {'drive':'🚗','fly':'✈','train':'🚆','bus':'🚌','walk':'🚶','bike':'🚲','transit':'🚇','ferry':'⛴'}.get(r.get('mode',''), '→')
+                          from_name = stops.get(r.get('from',''),{}).get('name','?')
+                          to_name = stops.get(r.get('to',''),{}).get('name','?')
+                          print(f'    {mode_icon} {from_name} → {to_name}{dur_str(r.get('dur'))} ({r.get('mode','')}, {r.get('dist','?')}km)')
+                      elif item['type'] == 'flex':
+                          pick = item.get('pick', 1)
+                          print(f'    🔀 Choose {pick}:')
+                          for opt in item.get('opts', []):
+                              if opt['type'] == 'stop':
+                                  s = stops.get(opt.get('ref',''), {})
+                                  print(f'       └ {s.get('name','?')} — {s.get('goal','?')}')
+                              elif opt['type'] == 'note':
+                                  print(f'       └ 📝 {opt['txt']}')
+
+          print(f'\n{'='*60}')
+          print('  All examples valid ✓')
+          print(f'{'='*60}')
+          "
+
+  geocoder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test geocoder dry-run
+        run: |
+          python geocode.py examples/sf-to-la.json --dry-run
