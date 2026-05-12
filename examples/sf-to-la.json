@@ -1,88 +1,115 @@
 {
-  "$schema": "https://openitin.org/schema/v1",
+  "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+  "version": "0.2",
   "name": "SF to LA Road Trip",
+  "summary": "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1. Expect stunning cliff views, fresh seafood, and at least one stop that makes you consider moving there.",
+  "tags": ["road-trip", "coastal", "california", "scenic"],
   "tz": "America/Los_Angeles",
   "cur": "USD",
-  "desc": "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1",
+  "generated_by": "claude-sonnet-4",
+  "created_at": "2026-05-11T10:00:00Z",
   "stops": [
     {
       "id": "sf",
       "name": "San Francisco",
-      "cat": "attraction",
-      "addr": "San Francisco, CA 94102",
-      "note": "Start here early morning"
+      "goal": "Start the trip — fuel up and hit the coast",
+      "cat": "other",
+      "addr": "San Francisco, CA 94102"
     },
     {
       "id": "monterey",
       "name": "Monterey Bay Aquarium",
+      "goal": "See the sea otters and the kelp forest — one of the best aquariums in the world",
       "cat": "attraction",
       "addr": "886 Cannery Row, Monterey, CA 93940",
-      "dur": "PT2H",
-      "cost": { "amt": 65, "cur": "USD" },
-      "url": "https://www.montereybayaquarium.org"
+      "dur": { "min": 1.5, "max": 2.5 },
+      "cost": { "amt": 65 },
+      "url": "https://www.montereybayaquarium.org",
+      "note": "Book online to skip the line. The Open Sea exhibit is unmissable.",
+      "alts": [
+        {
+          "name": "Monterey State Beach",
+          "goal": "Skip the aquarium and walk the beach instead — free and just as memorable",
+          "cat": "nature"
+        },
+        {
+          "name": "Cannery Row",
+          "goal": "Walk Cannery Row for shops and people-watching instead of the aquarium",
+          "cat": "shopping",
+          "dur": { "min": 1, "max": 2 }
+        }
+      ]
     },
     {
       "id": "big-sur-inn",
       "name": "Big Sur River Inn",
-      "cat": "hotel",
+      "goal": "Overnight stay — creekside rooms in the heart of Big Sur",
+      "cat": "accommodation",
       "addr": "46800 CA-1, Big Sur, CA 93920",
       "cost": { "amt": 280 },
       "url": "https://www.bigsurriverinn.com",
-      "note": "Book a creekside room"
+      "note": "Book a creekside room. Restaurant on site — the apple pie is famous."
     },
     {
       "id": "mcway-falls",
       "name": "McWay Falls",
-      "cat": "attraction",
+      "goal": "Quick photo stop — waterfall dropping onto a secluded beach",
+      "cat": "viewpoint",
       "addr": "Julia Pfeiffer Burns State Park, CA-1, Big Sur, CA 93920",
-      "dur": "PT30M",
-      "note": "Quick stop for photos, no hiking required"
+      "dur": { "min": 0.25, "max": 0.75 },
+      "note": "Easy overlook trail, no hiking required. Morning light is best for photos."
     },
     {
       "id": "hearst-castle",
       "name": "Hearst Castle",
+      "goal": "Tour the most absurd private home in American history",
       "cat": "attraction",
       "addr": "750 Hearst Castle Rd, San Simeon, CA 93452",
-      "dur": "PT2H30M",
+      "dur": { "min": 2, "max": 4 },
       "cost": { "amt": 30 },
       "url": "https://hearstcastle.org",
-      "note": "Book the Grand Rooms tour in advance"
+      "note": "Book the Grand Rooms tour in advance — it's the best first-timer option."
     },
     {
       "id": "solvang",
       "name": "Solvang",
-      "cat": "attraction",
+      "goal": "Stretch and grab a Danish pastry in a surreal Danish-themed town",
+      "cat": "food",
       "addr": "Solvang, CA 93463",
-      "dur": "PT1H30M",
-      "note": "Danish-style town, grab a pastry"
+      "dur": { "min": 1, "max": 2 },
+      "note": "Try Olsen's Danish Village Bakery. The æbleskiver (pancake balls) are the move."
     },
     {
       "id": "santa-barbara-inn",
       "name": "Santa Barbara Inn",
-      "cat": "hotel",
+      "goal": "Overnight stay with ocean views in Santa Barbara",
+      "cat": "accommodation",
       "addr": "901 E Cabrillo Blvd, Santa Barbara, CA 93103",
       "cost": { "amt": 350 },
-      "note": "Ocean view if available"
+      "note": "Ocean view rooms are worth the upgrade. Walk to the Funk Zone for wine tasting."
     },
     {
       "id": "santa-barbara-pier",
       "name": "Stearns Wharf",
+      "goal": "Walk the pier — fresh seafood and ocean views",
       "cat": "attraction",
       "addr": "217 Stearns Wharf, Santa Barbara, CA 93101",
-      "dur": "PT1H"
+      "dur": { "min": 0.5, "max": 1.5 }
     },
     {
       "id": "santa-monica",
       "name": "Santa Monica Pier",
+      "goal": "End of the road — touch the Route 66 sign, get the photo, call it done",
       "cat": "attraction",
       "addr": "200 Santa Monica Pier, Santa Monica, CA 90401",
-      "dur": "PT1H",
-      "note": "End the trip here"
+      "dur": { "min": 0.5, "max": 2 },
+      "note": "You made it. The pier is touristy but the symbolism is real. Sunset here is a solid finish."
     },
     {
       "id": "la-hotel",
-      "name": "Hotel in LA",
-      "cat": "hotel",
+      "name": "Hotel in Downtown LA",
+      "goal": "Final overnight — rest up before the real world resumes",
+      "cat": "accommodation",
       "addr": "Los Angeles, CA 90012"
     }
   ],
@@ -92,64 +119,65 @@
       "from": "sf",
       "to": "monterey",
       "mode": "drive",
-      "dur": "PT2H",
+      "dur": { "min": 1.75, "max": 2.5 },
       "dist": 180,
-      "note": "Take I-280 S to CA-1 S, scenic but slower"
+      "note": "Take I-280 S to CA-1 S. Scenic but slower — budget extra time for photo pullouts."
     },
     {
       "id": "monterey-to-bigsur",
       "from": "monterey",
       "to": "big-sur-inn",
       "mode": "drive",
-      "dur": "PT45M",
+      "dur": { "min": 0.5, "max": 1 },
       "dist": 55,
-      "note": "CA-1 S, Bixby Bridge is a must-stop photo op"
+      "note": "CA-1 S. Bixby Bridge is a must-stop photo op — pullout on the north side."
     },
     {
       "id": "bigsur-to-hearst",
       "from": "big-sur-inn",
       "to": "hearst-castle",
       "mode": "drive",
-      "dur": "PT1H30M",
+      "dur": { "min": 1.25, "max": 2 },
       "dist": 100,
-      "note": "Stop at McWay Falls on the way"
+      "note": "Stop at McWay Falls on the way. Check Caltrans for CA-1 closures before this leg — washouts are common."
     },
     {
       "id": "hearst-to-solvang",
       "from": "hearst-castle",
       "to": "solvang",
       "mode": "drive",
-      "dur": "PT1H15M",
-      "dist": 110
+      "dur": { "min": 1, "max": 1.5 },
+      "dist": 110,
+      "note": "Elephant seal rookery at Piedras Blancas is worth a 10-min stop just north of Hearst Castle."
     },
     {
       "id": "solvang-to-sb",
       "from": "solvang",
       "to": "santa-barbara-inn",
       "mode": "drive",
-      "dur": "PT45M",
+      "dur": { "min": 0.5, "max": 1 },
       "dist": 55,
-      "note": "CA-154 for mountain views, or US-101 for speed"
+      "note": "CA-154 for mountain views, or US-101 for speed. Take 154 if the weather is clear."
     },
     {
       "id": "sb-to-la",
       "from": "santa-barbara-inn",
       "to": "santa-monica",
       "mode": "drive",
-      "dur": "PT2H",
+      "dur": { "min": 1.5, "max": 3 },
       "dist": 150,
-      "note": "US-101 S, traffic builds after 3pm"
+      "note": "US-101 S to I-405 S. Traffic builds hard after 3pm — leave Santa Barbara by noon if you can."
     }
   ],
   "days": [
     {
       "date": "2026-06-15",
-      "note": "SF to Big Sur — the best stretch of coastline",
+      "note": "SF to Big Sur — the best stretch of coastline in California",
       "items": [
         { "type": "stop", "ref": "sf" },
         { "type": "route", "ref": "sf-to-monterey" },
         { "type": "stop", "ref": "monterey" },
-        { "type": "note", "txt": "Grab lunch on Cannery Row" },
+        { "type": "note", "txt": "Grab lunch on Cannery Row — the clam chowder in a sourdough bowl is not a cliché, it's just correct" },
         { "type": "route", "ref": "monterey-to-bigsur" },
         { "type": "stop", "ref": "big-sur-inn" }
       ]
@@ -170,7 +198,7 @@
           "pick": 1,
           "opts": [
             { "type": "stop", "ref": "santa-barbara-pier" },
-            { "type": "note", "txt": "Walk State Street for shopping and wine tasting" }
+            { "type": "note", "txt": "Walk State Street for shopping and wine tasting in the Funk Zone" }
           ]
         }
       ]
@@ -185,9 +213,9 @@
           "type": "flex",
           "pick": 1,
           "opts": [
-            { "type": "note", "txt": "Dinner in Venice Beach — try Gjelina" },
-            { "type": "note", "txt": "Dinner in Santa Monica — try Cassia" },
-            { "type": "note", "txt": "Head to Koreatown for Korean BBQ" }
+            { "type": "note", "txt": "Dinner in Venice Beach — try Gjelina on Abbot Kinney" },
+            { "type": "note", "txt": "Dinner in Santa Monica — try Cassia for Southeast Asian" },
+            { "type": "note", "txt": "Head to Koreatown for Korean BBQ — Park's BBQ if you want the best" }
           ]
         },
         { "type": "stop", "ref": "la-hotel" }

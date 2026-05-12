@@ -1,95 +1,187 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://openitin.org/schema/v1",
+  "$id": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
   "title": "Open Itinerary",
   "description": "An open, token-efficient format for travel itineraries — designed for AI agents to output and apps to consume.",
   "type": "object",
+  "required": ["$schema", "version", "name", "stops", "days"],
+  "additionalProperties": false,
   "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Must point to the Open Itinerary schema URI.",
+      "const": "https://openitinerary.org/schema/v0.2/itinerary.schema.json"
+    },
+    "version": {
+      "type": "string",
+      "description": "Schema version this document conforms to.",
+      "const": "0.2"
+    },
     "name": {
       "type": "string",
-      "description": "Trip name (e.g. 'SF to LA Road Trip')"
+      "description": "Short human-readable name for the itinerary.",
+      "examples": ["Pacific Coast Highway Road Trip", "48 Hours in Tokyo"]
+    },
+    "summary": {
+      "type": "string",
+      "description": "A one-to-three sentence overview of the itinerary, suitable for display or agent handoff."
+    },
+    "tags": {
+      "type": "array",
+      "description": "Free-form labels for filtering and discovery.",
+      "items": { "type": "string" }
     },
     "tz": {
       "type": "string",
-      "description": "Default IANA timezone for the trip (e.g. 'America/Los_Angeles')"
+      "description": "Default IANA timezone for the trip (e.g. 'America/Los_Angeles', 'Asia/Tokyo')."
     },
     "cur": {
       "type": "string",
-      "description": "Default ISO 4217 currency code (e.g. 'USD')",
+      "description": "Default ISO 4217 currency code (e.g. 'USD', 'JPY').",
       "pattern": "^[A-Z]{3}$"
-    },
-    "desc": {
-      "type": "string",
-      "description": "Short description or summary of the trip"
-    },
-    "url": {
-      "type": "string",
-      "format": "uri",
-      "description": "URL for the trip (booking, guide, etc.)"
     },
     "stops": {
       "type": "array",
-      "description": "Reusable catalog of stops (places you spend time). Referenced by id from days.",
+      "description": "Catalog of stops (places you spend time). Referenced by id from days.",
+      "minItems": 1,
       "items": { "$ref": "#/$defs/Stop" }
     },
     "routes": {
       "type": "array",
-      "description": "Reusable catalog of routes (travel between stops). Referenced by id from days.",
+      "description": "Catalog of routes (travel between stops). Referenced by id from days.",
       "items": { "$ref": "#/$defs/Route" }
     },
     "days": {
       "type": "array",
-      "description": "Ordered days of the trip",
+      "description": "Ordered days of the trip. Each day contains an ordered sequence of stops, routes, notes, and flex blocks.",
+      "minItems": 1,
       "items": { "$ref": "#/$defs/Day" }
+    },
+    "generated_by": {
+      "type": "string",
+      "description": "Name or identifier of the agent or app that produced this itinerary.",
+      "examples": ["claude-sonnet-4", "MyTravelApp/2.0"]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this itinerary was generated."
     }
   },
-  "required": ["name", "days"],
   "$defs": {
+    "Coords": {
+      "type": "object",
+      "required": ["lat", "lng", "source"],
+      "additionalProperties": false,
+      "description": "Geocoded coordinates. Always produced by a geocoder, never authored by an agent. Treat as a cache: discard and re-geocode if name or address changes.",
+      "properties": {
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "Latitude in decimal degrees (WGS84)."
+        },
+        "lng": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Longitude in decimal degrees (WGS84)."
+        },
+        "source": {
+          "type": "string",
+          "description": "Geocoding provider that produced these coordinates.",
+          "enum": ["nominatim", "photon", "google", "mapbox", "here", "manual"]
+        },
+        "geocoded_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when geocoding was performed."
+        }
+      }
+    },
+    "Duration": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A suggested time range in hours. Both fields are optional; omit if unknown.",
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Minimum suggested hours."
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum suggested hours."
+        }
+      }
+    },
+    "Cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Estimated cost.",
+      "properties": {
+        "amt": { "type": "number", "description": "Amount." },
+        "cur": { "type": "string", "description": "ISO 4217 currency code (defaults to trip currency).", "pattern": "^[A-Z]{3}$" }
+      },
+      "required": ["amt"]
+    },
     "Stop": {
       "type": "object",
+      "required": ["id", "name", "goal"],
+      "additionalProperties": false,
       "description": "A place you spend time — hotel, restaurant, museum, trailhead, etc.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier referenced by days (e.g. 'stop-hotel')"
+          "description": "Unique identifier for this stop within the itinerary. Stable across edits."
         },
         "name": {
           "type": "string",
-          "description": "Display name (e.g. 'Golden Gate Bridge')"
+          "description": "Display name. This is the authoritative identifier — what a human would search for.",
+          "examples": ["Bixby Creek Bridge, Big Sur", "Tsukiji Outer Market, Tokyo"]
+        },
+        "goal": {
+          "type": "string",
+          "description": "Short phrase describing the purpose of this stop — the 'why' behind visiting.",
+          "examples": ["Scenic viewpoint — stretch and take photos", "Grab lunch at a seafood shack", "Overnight stay"]
         },
         "cat": {
           "type": "string",
-          "description": "Category: attraction, hotel, restaurant, transit, trail, or other",
-          "enum": ["attraction", "hotel", "restaurant", "transit", "trail", "other"]
+          "description": "Broad category for filtering and iconography.",
+          "enum": ["accommodation", "food", "drink", "attraction", "nature", "viewpoint", "transport", "rest", "shopping", "activity", "other"]
         },
         "addr": {
           "type": "string",
-          "description": "Street address or place name for geocoding (e.g. 'Golden Gate Bridge, San Francisco, CA 94129'). Consuming apps geocode this to coordinates at runtime."
+          "description": "Street address or place name for geocoding (e.g. '886 Cannery Row, Monterey, CA 93940')."
+        },
+        "coords": {
+          "$ref": "#/$defs/Coords",
+          "description": "Geocoded coordinates. Populated by the geocoder — do NOT set this when generating the itinerary."
+        },
+        "place_id": {
+          "type": "string",
+          "description": "External place identifier with namespace prefix: 'gplaces:ChIJ...' or 'osm:node/12345'."
         },
         "tz": {
           "type": "string",
-          "description": "IANA timezone override for this stop (e.g. 'America/Denver')"
+          "description": "IANA timezone override for this stop (e.g. 'America/Denver')."
+        },
+        "dur": {
+          "$ref": "#/$defs/Duration",
+          "description": "How long you spend here."
+        },
+        "cost": {
+          "$ref": "#/$defs/Cost",
+          "description": "Estimated cost for this stop."
         },
         "dep": {
           "type": "string",
-          "description": "Departure time — ISO 8601 time ('14:00') or datetime ('2026-06-15T14:00:00-07:00')"
+          "description": "Departure time — ISO 8601 time ('14:00') or datetime."
         },
         "arr": {
           "type": "string",
-          "description": "Arrival time — ISO 8601 time ('14:00') or datetime ('2026-06-15T14:00:00-07:00')"
-        },
-        "dur": {
-          "type": "string",
-          "description": "How long you spend here — ISO 8601 duration ('PT1H', 'PT2H30M')"
-        },
-        "cost": {
-          "type": "object",
-          "description": "Estimated cost",
-          "properties": {
-            "amt": { "type": "number", "description": "Amount" },
-            "cur": { "type": "string", "description": "ISO 4217 currency (defaults to trip currency)", "pattern": "^[A-Z]{3}$" }
-          },
-          "required": ["amt"]
+          "description": "Arrival time — ISO 8601 time ('14:00') or datetime."
         },
         "url": {
           "type": "string",
@@ -98,57 +190,89 @@
         },
         "note": {
           "type": "string",
-          "description": "Freeform note about this stop"
+          "description": "Additional context, tips, or caveats for this stop."
+        },
+        "alts": {
+          "type": "array",
+          "description": "Alternative options the traveler could choose instead of this stop.",
+          "items": { "$ref": "#/$defs/Alt" }
         }
-      },
-      "required": ["id", "name"]
+      }
+    },
+    "Alt": {
+      "type": "object",
+      "required": ["name", "goal"],
+      "additionalProperties": false,
+      "description": "A suggested alternative to a stop — lighter than a full Stop (no id, no nested alts).",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name of the alternative location."
+        },
+        "goal": {
+          "type": "string",
+          "description": "Why you'd choose this alternative.",
+          "examples": ["Budget-friendly option", "Better for vegetarians", "Closer to the highway"]
+        },
+        "cat": {
+          "type": "string",
+          "enum": ["accommodation", "food", "drink", "attraction", "nature", "viewpoint", "transport", "rest", "shopping", "activity", "other"]
+        },
+        "addr": {
+          "type": "string",
+          "description": "Street address for geocoding."
+        },
+        "dur": {
+          "$ref": "#/$defs/Duration"
+        },
+        "note": {
+          "type": "string",
+          "description": "Additional context for this alternative."
+        }
+      }
     },
     "Route": {
       "type": "object",
+      "required": ["id", "from", "to", "mode"],
+      "additionalProperties": false,
       "description": "Travel between two stops — drive, fly, train, walk, etc.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier referenced by days (e.g. 'route-drive-to-la')"
+          "description": "Unique identifier referenced by days."
         },
         "from": {
           "type": "string",
-          "description": "Stop id this route starts from"
+          "description": "Stop id this route starts from."
         },
         "to": {
           "type": "string",
-          "description": "Stop id this route ends at"
+          "description": "Stop id this route ends at."
         },
         "mode": {
           "type": "string",
-          "description": "Mode of transportation",
+          "description": "Mode of transportation.",
           "enum": ["drive", "fly", "train", "bus", "walk", "bike", "transit", "ferry", "other"]
         },
         "dur": {
-          "type": "string",
-          "description": "Travel duration — ISO 8601 duration ('PT6H30M', 'PT45M')"
+          "$ref": "#/$defs/Duration",
+          "description": "Travel duration range."
         },
         "dist": {
           "type": "number",
-          "description": "Distance in kilometers",
+          "description": "Distance in kilometers.",
           "minimum": 0
         },
         "dep": {
           "type": "string",
-          "description": "Departure time — ISO 8601 time or datetime"
+          "description": "Departure time — ISO 8601 time or datetime."
         },
         "arr": {
           "type": "string",
-          "description": "Arrival time — ISO 8601 time or datetime"
+          "description": "Arrival time — ISO 8601 time or datetime."
         },
         "cost": {
-          "type": "object",
-          "description": "Estimated cost",
-          "properties": {
-            "amt": { "type": "number" },
-            "cur": { "type": "string", "pattern": "^[A-Z]{3}$" }
-          },
-          "required": ["amt"]
+          "$ref": "#/$defs/Cost"
         },
         "url": {
           "type": "string",
@@ -157,79 +281,82 @@
         },
         "note": {
           "type": "string",
-          "description": "Freeform note about this route"
+          "description": "Additional context about this route."
         }
-      },
-      "required": ["id", "from", "to", "mode"]
+      }
     },
     "Day": {
       "type": "object",
-      "description": "One day of the trip",
+      "required": ["date"],
+      "additionalProperties": false,
+      "description": "One day of the trip.",
       "properties": {
         "date": {
           "type": "string",
-          "description": "ISO 8601 date (e.g. '2026-06-15')",
+          "description": "ISO 8601 date (e.g. '2026-06-15').",
           "format": "date"
         },
         "tz": {
           "type": "string",
-          "description": "IANA timezone override for this day"
+          "description": "IANA timezone override for this day."
         },
         "items": {
           "type": "array",
-          "description": "Ordered items for the day — stops, routes, notes, and flexible blocks",
+          "description": "Ordered items for the day — stops, routes, notes, and flex blocks.",
           "items": { "$ref": "#/$defs/DayItem" }
         },
         "note": {
           "type": "string",
-          "description": "Freeform note about this day"
+          "description": "Freeform note about this day."
         }
-      },
-      "required": ["date"]
+      }
     },
     "DayItem": {
       "oneOf": [
         {
           "type": "object",
-          "description": "Reference to a stop from the trip's stops catalog",
+          "description": "Reference to a stop from the trip's stops catalog.",
           "properties": {
             "type": { "type": "string", "const": "stop" },
-            "ref": { "type": "string", "description": "Stop id" }
+            "ref": { "type": "string", "description": "Stop id." }
           },
-          "required": ["type", "ref"]
+          "required": ["type", "ref"],
+          "additionalProperties": false
         },
         {
           "type": "object",
-          "description": "Reference to a route from the trip's routes catalog",
+          "description": "Reference to a route from the trip's routes catalog.",
           "properties": {
             "type": { "type": "string", "const": "route" },
-            "ref": { "type": "string", "description": "Route id" }
+            "ref": { "type": "string", "description": "Route id." }
           },
-          "required": ["type", "ref"]
+          "required": ["type", "ref"],
+          "additionalProperties": false
         },
         {
           "type": "object",
-          "description": "Freeform note within a day's timeline",
+          "description": "Freeform note within a day's timeline.",
           "properties": {
             "type": { "type": "string", "const": "note" },
-            "txt": { "type": "string", "description": "Note text" }
+            "txt": { "type": "string", "description": "Note text." }
           },
-          "required": ["type", "txt"]
+          "required": ["type", "txt"],
+          "additionalProperties": false
         },
         {
           "type": "object",
-          "description": "A set of alternatives — pick N from the options (e.g. 'choose one of these three restaurants')",
+          "description": "A set of alternatives — pick N from the options.",
           "properties": {
             "type": { "type": "string", "const": "flex" },
             "pick": {
               "type": "integer",
-              "description": "How many options to choose (default 1)",
+              "description": "How many options to choose (default 1).",
               "minimum": 1,
               "default": 1
             },
             "opts": {
               "type": "array",
-              "description": "The alternatives to choose from",
+              "description": "The alternatives to choose from.",
               "items": {
                 "oneOf": [
                   {
@@ -238,7 +365,8 @@
                       "type": { "const": "stop" },
                       "ref": { "type": "string" }
                     },
-                    "required": ["type", "ref"]
+                    "required": ["type", "ref"],
+                    "additionalProperties": false
                   },
                   {
                     "type": "object",
@@ -246,7 +374,8 @@
                       "type": { "const": "route" },
                       "ref": { "type": "string" }
                     },
-                    "required": ["type", "ref"]
+                    "required": ["type", "ref"],
+                    "additionalProperties": false
                   },
                   {
                     "type": "object",
@@ -254,13 +383,15 @@
                       "type": { "const": "note" },
                       "txt": { "type": "string" }
                     },
-                    "required": ["type", "txt"]
+                    "required": ["type", "txt"],
+                    "additionalProperties": false
                   }
                 ]
               }
             }
           },
-          "required": ["type", "opts"]
+          "required": ["type", "opts"],
+          "additionalProperties": false
         }
       ]
     }

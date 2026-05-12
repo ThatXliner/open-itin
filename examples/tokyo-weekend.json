@@ -1,127 +1,187 @@
 {
-  "$schema": "https://openitin.org/schema/v1",
+  "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+  "version": "0.2",
   "name": "Tokyo Weekend",
+  "summary": "A 2-day sprint through Tokyo — Shibuya, Shinjuku, Asakusa, and Akihabara. Temples in the morning, arcades at night, yakitori in between.",
+  "tags": ["city-break", "tokyo", "japan", "food", "transit"],
   "tz": "Asia/Tokyo",
   "cur": "JPY",
-  "desc": "A 2-day sprint through Tokyo — Shibuya, Shinjuku, Asakusa, and Akihabara",
+  "generated_by": "claude-sonnet-4",
+  "created_at": "2026-05-11T10:00:00Z",
   "stops": [
     {
       "id": "haneda",
       "name": "Haneda Airport (HND)",
-      "cat": "transit",
+      "goal": "Arrive in Tokyo",
+      "cat": "transport",
       "addr": "Hanedakuko, Ota City, Tokyo 144-0041",
-      "note": "Arriving Friday night, take Keikyu Line to Shinagawa"
+      "note": "Arriving Friday night. Take Keikyu Line to Shinagawa, transfer to JR Yamanote to Shibuya."
     },
     {
       "id": "hotel-shibuya",
       "name": "Shibuya Excel Hotel Tokyu",
-      "cat": "hotel",
+      "goal": "Overnight stay — connected to Shibuya Station, unbeatable location",
+      "cat": "accommodation",
       "addr": "1-12-2 Dogenzaka, Shibuya City, Tokyo 150-0043",
       "cost": { "amt": 25000 },
       "url": "https://www.tokyuhotels.co.jp/shibuya-e",
-      "note": "Connected to Shibuya Station, Mark City complex"
+      "note": "Mark City complex, directly connected to the station. Ask for a high floor — the scramble crossing view is worth it.",
+      "alts": [
+        {
+          "name": "Dormy Inn Premium Shibuya Jingumae",
+          "goal": "Budget-friendly alternative with an onsen on the top floor",
+          "cat": "accommodation",
+          "addr": "6-24-4 Jingumae, Shibuya City, Tokyo 150-0001"
+        }
+      ]
     },
     {
       "id": "shibuya-crossing",
       "name": "Shibuya Scramble Crossing",
-      "cat": "attraction",
+      "goal": "Stand at the world's busiest pedestrian crossing — it's a Tokyo rite of passage",
+      "cat": "viewpoint",
       "addr": "2-2-1 Dogenzaka, Shibuya City, Tokyo 150-0043",
-      "dur": "PT15M",
-      "note": "Best viewed from Starbucks Tsutaya 2F or Magnet 7F rooftop"
+      "dur": { "min": 0.25, "max": 0.5 },
+      "note": "Best viewed from Starbucks Tsutaya 2F (free, but busy) or Magnet 7F rooftop (¥500, less crowded). Go early — it's a mob by 10am."
     },
     {
       "id": "meiji-jingu",
       "name": "Meiji Jingu",
+      "goal": "Walk through massive torii gates into a forest in the middle of Tokyo — the city's most important Shinto shrine",
       "cat": "attraction",
       "addr": "1-1 Yoyogikamizonocho, Shibuya City, Tokyo 151-8557",
-      "dur": "PT1H30M",
-      "note": "Massive torii gates, free entry, closes at sunset. Buy an omamori (charm)."
+      "dur": { "min": 1, "max": 2 },
+      "note": "Free entry. Closes at sunset. Buy an omamori (charm) — they make great small gifts. The sake barrel display near the entrance is photo-worthy."
     },
     {
       "id": "harajuku",
       "name": "Takeshita Street (Harajuku)",
-      "cat": "attraction",
+      "goal": "Crepes, vintage shops, and peak Tokyo people-watching",
+      "cat": "shopping",
       "addr": "1-chome Jingumae, Shibuya City, Tokyo 150-0001",
-      "dur": "PT1H30M",
-      "note": "Crepe stands, vintage shops, people watching"
+      "dur": { "min": 1, "max": 2 },
+      "note": "The crepe stands at the entrance are the real deal. For vintage, duck into the side streets — Takeshita itself is mostly fast fashion.",
+      "alts": [
+        {
+          "name": "Cat Street, Harajuku",
+          "goal": "Quieter, cooler alternative to Takeshita — indie boutiques and better coffee",
+          "cat": "shopping",
+          "note": "Connects Harajuku to Shibuya. Good if Takeshita's crowds get to you."
+        }
+      ]
     },
     {
       "id": "omotesando",
       "name": "Omotesando",
-      "cat": "attraction",
+      "goal": "Walk Tokyo's Champs-Élysées — flagship architecture and design shops",
+      "cat": "shopping",
       "addr": "4-chome Jingumae, Shibuya City, Tokyo 150-0001",
-      "dur": "PT1H",
-      "note": "Tokyo's Champs-Élysées — architecture and high-end shopping"
+      "dur": { "min": 0.75, "max": 1.5 },
+      "note": "Stop at Koffee Mameya for a pour-over — it's a tiny standing-room-only coffee bar in a converted warehouse."
     },
     {
       "id": "shinjuku-gyoen",
       "name": "Shinjuku Gyoen National Garden",
-      "cat": "attraction",
+      "goal": "Escape the concrete — greenhouse, French Formal Garden, and Japanese garden in one park",
+      "cat": "nature",
       "addr": "11 Naitomachi, Shinjuku City, Tokyo 160-0014",
-      "dur": "PT1H30M",
+      "dur": { "min": 1, "max": 2 },
       "cost": { "amt": 500 },
-      "note": "Greenhouse, French Formal Garden, Japanese Garden. Closes 5:30pm."
+      "note": "Closes 5:30pm, last entry 5pm. The Japanese garden section is the highlight — find the tea house."
     },
     {
       "id": "omoide-yokocho",
       "name": "Omoide Yokocho (Piss Alley)",
-      "cat": "restaurant",
+      "goal": "Dinner in a post-war alleyway of yakitori stalls — the Tokyo that tourists hope to find",
+      "cat": "food",
       "addr": "1-2 Nishishinjuku, Shinjuku City, Tokyo 160-0023",
-      "dur": "PT2H",
-      "note": "Tiny yakitori alleys, cash only at most stalls. Get there before 6pm for a seat."
+      "dur": { "min": 1.5, "max": 3 },
+      "note": "Cash only at most stalls. Get there before 6pm for a seat — the best stalls fit 6 people and fill instantly. Try the shiitake skewers even if you think you want meat.",
+      "alts": [
+        {
+          "name": "Nakajima, Shinjuku",
+          "goal": "Michelin-starred sardine set lunch for ~¥800 — one of Tokyo's best food deals",
+          "cat": "food",
+          "note": "Lunch only. Line forms at 11am. The iwashi teishoku is what you're here for."
+        }
+      ]
     },
     {
       "id": "golden-gai",
       "name": "Golden Gai",
-      "cat": "restaurant",
+      "goal": "Bar hop through 200+ micro-bars in six narrow alleys — each bar seats 5-8 people max",
+      "cat": "drink",
       "addr": "1-1-6 Kabukicho, Shinjuku City, Tokyo 160-0021",
-      "note": "200+ micro-bars, many with cover charge (~¥500-1000). Great for bar hopping."
+      "note": "Many bars have cover charge (~¥500-1000). Bar Albatross is foreigner-friendly and a good starter. Don't take photos in the alleys without asking — some bar owners are strict about it."
     },
     {
       "id": "senso-ji",
       "name": "Sensō-ji",
+      "goal": "Tokyo's oldest temple — get there before the crowds for the best experience",
       "cat": "attraction",
       "addr": "2-3-1 Asakusa, Taito City, Tokyo 111-0032",
-      "dur": "PT1H",
-      "note": "Tokyo's oldest temple. Nakamise-dori shops open ~10am. Beat the crowds before 9am."
+      "dur": { "min": 0.75, "max": 1.5 },
+      "note": "Nakamise-dori shops open ~10am. Before 9am you'll have the main hall nearly to yourself. Get your fortune (omikuji) — if it's bad, tie it to the rack and leave the bad luck behind."
     },
     {
       "id": "sumida-river",
       "name": "Sumida River Walk",
-      "cat": "attraction",
+      "goal": "Walk the river terrace toward Skytree — best photo angles of the tower",
+      "cat": "viewpoint",
       "addr": "Sumida River Terrace, Taito City, Tokyo 111-0032",
-      "dur": "PT30M",
-      "note": "Walk toward Skytree along the river, great photo angles"
+      "dur": { "min": 0.25, "max": 0.75 },
+      "note": "Coffee at Fuglen Asakusa — Scandinavian-Japanese hybrid in a restored ryokan. The river walk is a 5-min detour from Sensō-ji."
     },
     {
       "id": "asakusa-lunch",
       "name": "Lunch in Asakusa",
-      "cat": "restaurant",
+      "goal": "Unagi (eel) or tempura in one of Tokyo's oldest neighborhoods",
+      "cat": "food",
       "addr": "Asakusa, Taito City, Tokyo 111-0032",
-      "note": "Try unagi (eel) at Unatoto or tempura at Daikokuya"
+      "note": "Unatoto for casual unagi (counter seating, ¥2000-3000). Daikokuya for tempura (cash only, the tendon is legendary).",
+      "alts": [
+        {
+          "name": "Sometaro, Asakusa",
+          "goal": "Cook-your-own okonomiyaki in a 60-year-old restaurant — fun and interactive",
+          "cat": "food",
+          "note": "Floor seating on tatami. Great if you want a break from sushi and ramen."
+        }
+      ]
     },
     {
       "id": "akihabara",
       "name": "Akihabara Electric Town",
+      "goal": "Retro games, arcades, anime, and the sensory overload of Tokyo's tech district",
       "cat": "attraction",
       "addr": "1-chome Sotokanda, Chiyoda City, Tokyo 101-0021",
-      "dur": "PT2H30M",
-      "note": "Yodobashi Camera, Super Potato (retro games), arcades, anime shops"
+      "dur": { "min": 2, "max": 4 },
+      "note": "Super Potato (retro games, 5th floor) is the pilgrimage site. Yodobashi Camera for everything else. The Sega arcades are gone but Taito HEY is still going strong."
     },
     {
       "id": "tonkatsu-marugo",
       "name": "Tonkatsu Marugo",
-      "cat": "restaurant",
+      "goal": "Legendary tonkatsu — thick-cut, perfectly fried, worth the line",
+      "cat": "food",
       "addr": "1-8-14 Sotokanda, Chiyoda City, Tokyo 101-0021",
       "cost": { "amt": 2500 },
-      "note": "Legendary tonkatsu. Opens 11:30, line forms early."
+      "note": "Opens 11:30, line forms early. Only ~12 counter seats. The hire-katsu (lean fillet) and rosu-katsu (fatty loin) are both correct — get the rosu.",
+      "alts": [
+        {
+          "name": "Kyushu Jangara Akihabara",
+          "goal": "Famous tonkotsu ramen — faster than Marugo, just as satisfying",
+          "cat": "food",
+          "addr": "3-11-6 Sotokanda, Chiyoda City, Tokyo 101-0021",
+          "note": "Open all afternoon. The karashi (spicy) miso tonkotsu is what you want."
+        }
+      ]
     },
     {
       "id": "haneda-depart",
       "name": "Haneda Airport (HND)",
-      "cat": "transit",
+      "goal": "Catch the 8pm flight home",
+      "cat": "transport",
       "addr": "Hanedakuko, Ota City, Tokyo 144-0041",
-      "note": "8pm flight, arrive by 6pm. Keikyu Line from Shinagawa."
+      "note": "Arrive by 6pm. Keikyu Line from Shinagawa. The observation deck at Terminal 3 is a solid farewell — open-air views of the runway and Tokyo Bay."
     }
   ],
   "routes": [
@@ -130,97 +190,97 @@
       "from": "haneda",
       "to": "hotel-shibuya",
       "mode": "train",
-      "dur": "PT45M",
+      "dur": { "min": 0.5, "max": 1 },
       "cost": { "amt": 580 },
-      "note": "Keikyu Line to Shinagawa, transfer to JR Yamanote Line (counter-clockwise) to Shibuya"
+      "note": "Keikyu Line to Shinagawa, transfer to JR Yamanote (counter-clockwise) to Shibuya."
     },
     {
       "id": "shibuya-to-meiji",
       "from": "hotel-shibuya",
       "to": "meiji-jingu",
       "mode": "walk",
-      "dur": "PT25M",
-      "note": "Walk through Miyashita Park for a rooftop detour"
+      "dur": { "min": 0.25, "max": 0.5 },
+      "note": "Walk through Miyashita Park for a rooftop detour — good for a quick coffee at the start."
     },
     {
       "id": "meiji-to-harajuku",
       "from": "meiji-jingu",
       "to": "harajuku",
       "mode": "walk",
-      "dur": "PT10M",
-      "note": "Exit Meiji Jingu via Harajuku gate, Takeshita Street is right there"
+      "dur": { "min": 0.1, "max": 0.25 },
+      "note": "Exit Meiji Jingu via the Harajuku gate — Takeshita Street is right there."
     },
     {
       "id": "harajuku-to-omotesando",
       "from": "harajuku",
       "to": "omotesando",
       "mode": "walk",
-      "dur": "PT15M",
-      "note": "Walk down Omotesando Ave, stop at Koffee Mameya for pour-over"
+      "dur": { "min": 0.15, "max": 0.3 },
+      "note": "Walk down Omotesando Ave. Stop at Koffee Mameya for pour-over."
     },
     {
       "id": "omotesando-to-shinjuku",
       "from": "omotesando",
       "to": "shinjuku-gyoen",
       "mode": "transit",
-      "dur": "PT20M",
-      "note": "Tokyo Metro Chiyoda Line from Omotesando to Shinjuku-gyoemmae"
+      "dur": { "min": 0.25, "max": 0.5 },
+      "note": "Tokyo Metro Chiyoda Line from Omotesando to Shinjuku-gyoemmae (3 stops)."
     },
     {
       "id": "gyoen-to-omoide",
       "from": "shinjuku-gyoen",
       "to": "omoide-yokocho",
       "mode": "walk",
-      "dur": "PT15M",
-      "note": "Exit garden at Shinjuku gate, walk through the station area"
+      "dur": { "min": 0.2, "max": 0.3 },
+      "note": "Exit garden at Shinjuku gate, walk through the station area toward the west exit."
     },
     {
       "id": "omoide-to-golden-gai",
       "from": "omoide-yokocho",
       "to": "golden-gai",
       "mode": "walk",
-      "dur": "PT10M",
-      "note": "Through the east side of Shinjuku station, past Kabukicho signs"
+      "dur": { "min": 0.1, "max": 0.2 },
+      "note": "Through the east side of Shinjuku station, past Kabukicho signs. 10 min walk."
     },
     {
       "id": "shibuya-to-asakusa",
       "from": "hotel-shibuya",
       "to": "senso-ji",
       "mode": "transit",
-      "dur": "PT40M",
-      "note": "JR Yamanote to Ueno, transfer to Tokyo Metro Ginza Line to Asakusa"
+      "dur": { "min": 0.5, "max": 0.75 },
+      "note": "JR Yamanote to Ueno, transfer to Tokyo Metro Ginza Line to Asakusa. ~40 min."
     },
     {
-      "id": "sensōji-to-sumida",
+      "id": "sensoji-to-sumida",
       "from": "senso-ji",
       "to": "sumida-river",
       "mode": "walk",
-      "dur": "PT5M",
-      "note": "Cross the street behind Sensō-ji to reach the river path"
+      "dur": { "min": 0.05, "max": 0.1 },
+      "note": "Cross the street behind Sensō-ji to reach the river terrace. 5 min."
     },
     {
       "id": "sumida-to-akihabara",
       "from": "sumida-river",
       "to": "akihabara",
       "mode": "transit",
-      "dur": "PT20M",
-      "note": "Tsukuba Express from Asakusa to Akihabara (2 stops)"
+      "dur": { "min": 0.2, "max": 0.4 },
+      "note": "Tsukuba Express from Asakusa to Akihabara (2 stops)."
     },
     {
       "id": "akihabara-to-haneda",
       "from": "akihabara",
       "to": "haneda-depart",
       "mode": "train",
-      "dur": "PT45M",
-      "note": "JR Yamanote to Shinagawa, transfer to Keikyu Line to HND"
+      "dur": { "min": 0.5, "max": 0.75 },
+      "note": "JR Yamanote to Shinagawa, transfer to Keikyu Line to HND."
     }
   ],
   "days": [
     {
       "date": "2026-06-13",
-      "note": "West Tokyo — Shibuya, Harajuku, Omotesando, Shinjuku",
+      "note": "West Tokyo — Shibuya, Harajuku, Omotesando, Shinjuku. Day 1 is a greatest-hits tour of Tokyo's west side.",
       "items": [
-        { "type": "note", "txt": "Grab breakfast at the hotel or a konbini (FamilyMart onigiri + Boss coffee)" },
+        { "type": "note", "txt": "Grab breakfast at the hotel or a konbini — FamilyMart onigiri + Boss coffee is the authentic Tokyo morning" },
         { "type": "stop", "ref": "shibuya-crossing" },
         { "type": "route", "ref": "shibuya-to-meiji" },
         { "type": "stop", "ref": "meiji-jingu" },
@@ -237,7 +297,8 @@
           "pick": 1,
           "opts": [
             { "type": "note", "txt": "Karaoke in Shinjuku — try a Kan Kan location for cheap all-you-can-drink" },
-            { "type": "stop", "ref": "golden-gai" }
+            { "type": "stop", "ref": "golden-gai" },
+            { "type": "note", "txt": "Late-night ramen at Ichiran Shinjuku (open 24h)" }
           ]
         },
         { "type": "note", "txt": "Last Yamanote train ~12:50am — don't miss it back to Shibuya" }
@@ -245,13 +306,12 @@
     },
     {
       "date": "2026-06-14",
-      "note": "East Tokyo — Asakusa, Akihabara, and depart",
+      "note": "East Tokyo — Asakusa, Akihabara, and depart. Temples in the morning, arcades in the afternoon.",
       "items": [
         { "type": "route", "ref": "shibuya-to-asakusa" },
         { "type": "stop", "ref": "senso-ji" },
-        { "type": "route", "ref": "sensōji-to-sumida" },
+        { "type": "route", "ref": "sensoji-to-sumida" },
         { "type": "stop", "ref": "sumida-river" },
-        { "type": "note", "txt": "Coffee at Fuglen Asakusa — a Scandinavian-Japanese hybrid in an old ryokan" },
         { "type": "stop", "ref": "asakusa-lunch" },
         { "type": "route", "ref": "sumida-to-akihabara" },
         { "type": "stop", "ref": "akihabara" },
@@ -260,7 +320,7 @@
           "pick": 1,
           "opts": [
             { "type": "stop", "ref": "tonkatsu-marugo" },
-            { "type": "note", "txt": "Ramen at Kyushu Jangara Akihabara (famous tonkotsu)" }
+            { "type": "note", "txt": "Ramen at Kyushu Jangara Akihabara (famous tonkotsu, open all afternoon)" }
           ]
         },
         { "type": "route", "ref": "akihabara-to-haneda" },

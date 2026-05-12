@@ -6,29 +6,45 @@
 
 ## The problem
 
-Ask an AI to plan a trip and you get back a wall of text. Or maybe some ad-hoc JSON. Either way, no map app, calendar, or travel tool can read it. Every AI travel agent reinvents the same wheel with slightly different JSON shapes. Meanwhile, developers building travel apps have no standard input format to target.
+Ask five AI agents to plan a road trip. Get five completely different JSON shapes — or worse, prose. There's no standard for what a "stop" is, how alternatives are represented, or how to hand an itinerary off from one app to another without writing a custom parser.
 
 Existing formats don't help: Schema.org's `Trip` is too abstract for real itineraries, iCalendar wasn't designed for planning, and GTFS is transit-specific.
 
+Open Itinerary is to travel plans what iCalendar is to events: boring, useful, and open.
+
+---
+
 ## What it is
 
-Open Itinerary is a [JSON Schema](./open-itin.schema.json) that describes a structured travel plan. A single file. No library required. Validate it with any JSON Schema validator in any language.
+A published JSON Schema + a `$schema` pointer in every document. That's it.
 
-**The format IS the schema.**
+**The format IS the schema.** Validate with any JSON Schema validator in any language. Files use the extension `.oitinerary.json` and the MIME type `application/vnd.open-itinerary+json`.
 
 ```json
 {
+  "$schema": "https://openitinerary.org/schema/v0.2/itinerary.schema.json",
+  "version": "0.2",
   "name": "SF to LA Road Trip",
+  "summary": "A 3-day coastal road trip from San Francisco to Los Angeles via Highway 1.",
+  "tags": ["road-trip", "coastal", "california"],
   "tz": "America/Los_Angeles",
   "cur": "USD",
   "stops": [
     {
       "id": "monterey",
       "name": "Monterey Bay Aquarium",
+      "goal": "See the sea otters and kelp forest",
       "cat": "attraction",
       "addr": "886 Cannery Row, Monterey, CA 93940",
-      "dur": "PT2H",
-      "cost": { "amt": 65, "cur": "USD" }
+      "dur": { "min": 1.5, "max": 2.5 },
+      "cost": { "amt": 65 },
+      "alts": [
+        {
+          "name": "Monterey State Beach",
+          "goal": "Free alternative — walk the beach instead",
+          "cat": "nature"
+        }
+      ]
     }
   ],
   "routes": [
@@ -37,14 +53,13 @@ Open Itinerary is a [JSON Schema](./open-itin.schema.json) that describes a stru
       "from": "sf",
       "to": "monterey",
       "mode": "drive",
-      "dur": "PT2H",
+      "dur": { "min": 1.75, "max": 2.5 },
       "dist": 180
     }
   ],
   "days": [
     {
       "date": "2026-06-15",
-      "note": "SF to Big Sur",
       "items": [
         { "type": "stop", "ref": "sf" },
         { "type": "route", "ref": "sf-to-monterey" },
@@ -59,28 +74,83 @@ Open Itinerary is a [JSON Schema](./open-itin.schema.json) that describes a stru
         }
       ]
     }
-  ]
+  ],
+  "generated_by": "claude-sonnet-4",
+  "created_at": "2026-05-11T10:00:00Z"
 }
 ```
 
-## Why not just ad-hoc JSON?
+After running the geocoder, coordinates are added automatically:
 
-**Token efficiency.** Short field names (`tz` not `timezone`, `dur` not `durationMinutes`, `addr` not `location`) save 30-40% on output tokens vs verbose alternatives. When every token costs money in an LLM call, this matters.
+```json
+{
+  "id": "monterey",
+  "name": "Monterey Bay Aquarium",
+  "addr": "886 Cannery Row, Monterey, CA 93940",
+  "coords": {
+    "lat": 36.6183,
+    "lng": -121.9017,
+    "source": "nominatim",
+    "geocoded_at": "2026-05-11T10:00:00Z"
+  }
+}
+```
 
-**Flat structure.** Stops and routes live in top-level catalogs, referenced by `id` from each day. This avoids duplicating stop details when a place appears in multiple days, and LLMs handle flat references better than deeply nested JSON.
+---
 
-**No hallucinated coordinates.** LLMs don't have a real geospatial model — they guess coordinates and get them wrong. Open Itinerary uses street addresses (`addr`) instead. The consuming app geocodes the address to accurate coordinates at runtime. The LLM outputs what it actually knows (the address) and stops there.
+## Key design decisions
 
-**Resolved ambiguity.** Trip planning has subtle edge cases: time zone boundaries, flexible blocks ("choose your own adventure"), multi-modal routes, optional activities. The schema handles these explicitly rather than forcing each agent to invent its own convention.
+**`name` is truth, `coords` is a cache.** AI agents hallucinate coordinates — they'll confidently emit a lat/lng that's in the right region but wrong by kilometers. The schema makes `name` (and optionally `addr`) the authoritative location identifier. Coordinates live in a `coords` sub-object that is always produced by a geocoder, never by an agent. If the name changes, discard `coords` and re-geocode.
+
+**Every stop has a `goal`.** The single most important field. It answers *why* you're stopping, not just *where*. This forces AI agents to be explicit about intent and gives consuming apps a human-readable string that works without further parsing.
+
+**Token efficiency is a feature.** Short field names (`tz` not `timezone`, `dur` not `duration`, `cur` not `currency`, `cat` not `category`, `alts` not `alternatives`, `dep` not `departureTime`, `dist` not `distanceKm`) save 25-35% on output tokens vs verbose alternatives. When every token costs money in an LLM call, this matters.
+
+**Flat structure with references.** Stops and routes live in top-level catalogs, referenced by `id` from each day. This avoids duplicating stop details and LLMs handle flat references better than deeply nested JSON.
+
+**Alternatives are first-class.** Real travel involves choices. Stops have an `alts` array for "instead of this, consider that." Days have `flex` blocks for "choose N of these" — the decision isn't made yet.
+
+**Days are explicit containers with ordered items.** Not just a `day` number on each stop — days contain an ordered sequence of stops, routes, notes, and flex blocks. This preserves intra-day order and lets apps render a precise timeline.
+
+**Duration ranges, not fixed times.** `dur: {min: 1.5, max: 2.5}` acknowledges that travel durations are estimates. Exact departure/arrival times are optional (`dep`, `arr`) for when they matter (flights, reservations).
+
+---
+
+## Concepts
+
+| Entity | What it is | Required fields |
+|--------|-----------|-----------------|
+| **Trip** | The whole trip | `$schema`, `version`, `name`, `stops[]`, `days[]` |
+| **Stop** | A place you spend time | `id`, `name`, `goal` |
+| **Route** | Travel between two stops | `id`, `from`, `to`, `mode` |
+| **Day** | One day of the trip | `date` |
+| **DayItem** | An entry in a day's timeline | `type` ("stop", "route", "note", "flex") |
+| **Flex** | "Choose N of these" block | `type`, `opts[]` |
+| **Alt** | Alternative to a stop | `name`, `goal` |
+
+### Full field reference
+
+**Trip:** `$schema`, `version`, `name`, `summary`, `tags`, `tz`, `cur`, `stops[]`, `routes[]`, `days[]`, `generated_by`, `created_at`
+
+**Stop:** `id`, `name`, `goal`, `cat`, `addr`, `coords`, `place_id`, `tz`, `dur`, `cost`, `dep`, `arr`, `url`, `note`, `alts[]`
+
+**Route:** `id`, `from`, `to`, `mode`, `dur`, `dist`, `dep`, `arr`, `cost`, `url`, `note`
+
+**Day:** `date`, `tz`, `items[]`, `note`
+
+**Coords** (geocoder cache): `lat`, `lng`, `source`, `geocoded_at`
+
+**Duration:** `min`, `max` (both in hours, both optional)
+
+**Alt:** `name`, `goal`, `cat`, `addr`, `dur`, `note`
+
+---
 
 ## Quick start
 
 ### Validate an itinerary
 
 ```bash
-# Using ajv (Node)
-npx ajv validate -s open-itin.schema.json -d your-trip.json
-
 # Using Python
 pip install jsonschema
 python -c "
@@ -90,74 +160,87 @@ with open('your-trip.json') as f: data = json.load(f)
 jsonschema.validate(data, schema)
 print('Valid')
 "
+
+# Or with any JSON Schema validator — ajv, everit, gojsonschema, etc.
+```
+
+### Geocode it
+
+```bash
+python geocode.py your-trip.json           # geocode in place
+python geocode.py your-trip.json --dry-run  # preview only
 ```
 
 ### For AI tool developers
 
-Drop the schema into your function calling definition:
+Drop the schema into your function calling definition or system prompt:
 
-```python
-# OpenAI function calling
-{
-    "name": "create_itinerary",
-    "description": "Output a structured travel itinerary",
-    "parameters": { "$ref": "open-itin.schema.json" }  # point at the schema
-}
 ```
+Output the itinerary as a valid Open Itinerary JSON document conforming to:
+https://openitinerary.org/schema/v0.2/itinerary.schema.json
 
-Or paste it into your system prompt so the LLM knows the expected output format.
+Rules:
+- Every stop must have an id, name, and goal
+- Do NOT include coords — the geocoder will add them as a post-processing step
+- Add at least one alternative for any food, drink, or accommodation stop
+- Use the days array with items to preserve ordering within each day
+- Use dur with min/max in hours, not fixed timestamps (unless it's a flight or reservation)
+- Output only the JSON — no prose, no markdown fences
+```
 
 ### For app developers
 
-Accept an Open Itinerary JSON as input. Parse it like any other JSON. The schema guarantees well-formed data.
+Accept an Open Itinerary JSON as input. Parse it like any other JSON. The schema guarantees well-formed data. Geocode `addr` to get display coordinates. Render `days[].items` in order for a timeline view.
 
 ### For everyone else
 
-Use the [examples](./examples/) to see what the format looks like in practice.
-
-## Concepts
-
-| Entity | What it is | Key fields |
-|--------|-----------|------------|
-| **Trip** | The whole trip | `name`, `tz`, `cur`, `stops[]`, `routes[]`, `days[]` |
-| **Stop** | A place you spend time (hotel, restaurant, museum) | `id`, `name`, `cat`, `addr`, `dur`, `cost` |
-| **Route** | Travel between two stops (drive, fly, walk) | `id`, `from`, `to`, `mode`, `dur`, `dist` |
-| **Day** | One day of the trip | `date`, `tz`, `items[]` |
-| **Note** | Freeform text within a day's timeline | `txt` |
-| **Flex** | "Choose N of these" alternatives | `opts[]`, `pick` |
-
-### Annotated example
-
 See [examples/sf-to-la.json](./examples/sf-to-la.json) (3-day California road trip) and [examples/tokyo-weekend.json](./examples/tokyo-weekend.json) (2-day Tokyo sprint).
 
-## Design principles
-
-1. **The schema is the spec** — no separate document, no RFC. Comments (`$comment`) in the schema explain each field.
-2. **Token efficiency is a feature** — short field names, flat structure, references over duplication.
-3. **Time zones are first-class** — every trip, day, and stop can declare its own IANA timezone.
-4. **Extensible** — unknown fields are ignored, so apps can add custom metadata without breaking validators.
-5. **Zero dependencies** — a JSON Schema and some `.json` files. That's it.
+---
 
 ## Comparison
 
-| Format | Structured | Token-efficient | Time zones | Multi-modal | Flexible blocks |
-|--------|-----------|-----------------|------------|-------------|-----------------|
-| Open Itinerary | Yes | Yes | Yes | Yes | Yes |
-| Schema.org Trip | Yes | No | No | No | No |
-| iCalendar | Yes | No | Yes | No | No |
-| GTFS | Yes | N/A | Yes | Yes | No |
-| Ad-hoc JSON | Sort of | Varies | Rarely | Sometimes | Rarely |
-| Just text | No | — | Sometimes | Sometimes | Sometimes |
+| Format | goal field | Coords safety | Token-efficient | Time zones | Explicit routes | Flex blocks |
+|--------|-----------|--------------|-----------------|------------|-----------------|-------------|
+| Open Itinerary v0.2 | Yes | Geocoder cache | Yes | Yes | Yes | Yes |
+| Schema.org Trip | No | N/A | No | No | No | No |
+| iCalendar | No | N/A | No | Yes | No | No |
+| GTFS | No | N/A | N/A | Yes | Yes | No |
+| Ad-hoc JSON | Sometimes | No | Sometimes | Rarely | Sometimes | Rarely |
 
-## Status
+---
 
-**Alpha.** The schema is live, examples validate, and we're looking for early adopters. If you're building an AI travel tool or a travel app that could consume structured itineraries, open an issue and let's talk.
+## Geocoder
+
+`geocode.py` reads a `.oitinerary.json` file, queries Nominatim (OpenStreetMap) for every stop and alternative, and writes coordinates into `location.coords`. It unconditionally overwrites any existing coords — `name` is always truth.
+
+```bash
+python geocode.py my-trip.json
+python geocode.py my-trip.json --dry-run
+```
+
+Nominatim is free and requires no API key. The script enforces a 1.2s rate limit automatically. For higher volume, swap in Photon (`https://photon.komoot.io/api`) as a drop-in alternative.
+
+---
+
+## What's out of scope for v0.2
+
+Turn-by-turn routing, real-time status, booking data, split payments, multi-traveler fields, accessibility metadata. These may appear in future versions or optional extension namespaces.
+
+---
 
 ## Future
 
 - **Phase 2: Agent-optimized format** — a line-delimited, indentation-based serialization that maps 1:1 to the schema but strips JSON's syntactic overhead (braces, quotes, commas). See [notes/agent-optimized-format.md](./notes/agent-optimized-format.md).
 - Reference parser libraries (Python, TypeScript, Go)
 - Export adapters (Google Maps, Apple Maps, iCalendar, GPX)
+- `openitinerary.org` with schema hosting and docs
+
+---
+
+## Status
+
+**v0.2 alpha.** Breaking changes will increment the minor version. The `$schema` URI pins the version so consuming apps can detect and handle changes.
 
 ## License
 
