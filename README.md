@@ -232,7 +232,7 @@ python geocode.py your-trip.json --dry-run  # preview only
 
 ### For AI tool developers
 
-Use the KDL format for agent output — it's 60-80% more token-efficient than JSON and maps 1:1 to the data model. See [oitinerary.md](./oitinerary.md) for an example Claude Code agent skill that parallelizes itinerary generation across sub-agents.
+Use the KDL format for agent output — it's 60-80% more token-efficient than JSON and maps 1:1 to the data model. See [SKILL.md](./SKILL.md) for an example Claude Code agent skill that parallelizes itinerary generation across sub-agents.
 
 To use the JSON format, drop the schema into your function calling definition or system prompt:
 
@@ -249,7 +249,7 @@ Rules:
 - Output only the JSON — no prose, no markdown fences
 ```
 
-An [example Claude Code agent skill](./oitinerary.md) shows how to parallelize itinerary generation across sub-agents: research stops, routes, and day plans concurrently, then assemble and validate the output.
+An [example Claude Code agent skill](./SKILL.md) shows how to parallelize itinerary generation across sub-agents: research stops, routes, and day plans concurrently, then assemble and validate the output.
 
 ### For app developers
 
