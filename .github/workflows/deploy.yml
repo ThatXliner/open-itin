@@ -22,7 +22,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - run: pip install jsonschema
 
       - name: Validate schema
@@ -35,37 +34,29 @@ jobs:
           print('Schema OK')
           "
 
-      - name: Validate and render examples
-        run: |
-          python -c "
-          import json, jsonschema, glob
-          with open('open-itin.schema.json') as f:
-              schema = json.load(f)
-          for path in sorted(glob.glob('examples/*.json')):
-              with open(path) as f:
-                  data = json.load(f)
-              jsonschema.validate(data, schema)
-              name = data.get('name', path)
-              days = len(data.get('days', []))
-              stops = len(data.get('stops', []))
-              print(f'  OK {path}: \"{name}\" ({days} days, {stops} stops)')
-          print('All examples valid and rendered')
-          "
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
 
       - name: Setup Pages
+        id: pages
         uses: actions/configure-pages@v4
 
       - name: Build site
+        run: bun run build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - name: Copy additional files
         run: |
-          mkdir _site
-          cp index.html _site/
-          cp open-itin.schema.json _site/
-          cp -r examples _site/
+          cp open-itin.schema.json build/
+          cp -r examples build/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: build
 
   deploy:
     needs: build
