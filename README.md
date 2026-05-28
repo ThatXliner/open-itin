@@ -234,6 +234,17 @@ python geocode.py your-trip.json --dry-run  # preview only
 
 Use the KDL format for agent output — it's 60-80% more token-efficient than JSON and maps 1:1 to the data model. See [SKILL.md](./SKILL.md) for an example Claude Code agent skill that parallelizes itinerary generation across sub-agents.
 
+#### Claude Code plugin
+
+Install via plugin marketplace:
+
+```bash
+/plugin marketplace add ThatXliner/claude-plugins
+/plugin install open-itin
+```
+
+Then use `/open-itin` to generate itineraries.
+
 To use the JSON format, drop the schema into your function calling definition or system prompt:
 
 ```
