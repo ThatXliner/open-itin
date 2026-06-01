@@ -1,0 +1,9 @@
+{
+  "name": "open-itin",
+  "description": "Generate travel itineraries in Open Itinerary format (.oitinerary.kdl)",
+  "author": {
+    "name": "ThatXliner"
+  },
+  "repository": "https://github.com/ThatXliner/open-itin",
+  "license": "MIT"
+}
