@@ -1,5 +1,6 @@
 {
   "name": "open-itin",
+  "version": "0.1.0",
   "description": "Generate travel itineraries in Open Itinerary format (.oitinerary.kdl)",
   "author": {
     "name": "ThatXliner"
