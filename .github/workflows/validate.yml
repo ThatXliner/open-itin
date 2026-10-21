@@ -108,6 +108,10 @@ jobs:
         with:
           python-version: "3.12"
 
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.4"
+
       - name: Test geocoder dry-run
         run: |
-          python geocode.py examples/sf-to-la.json --dry-run
+          uv run --locked geocode.py examples/sf-to-la.json --dry-run
