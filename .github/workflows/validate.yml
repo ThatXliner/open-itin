@@ -16,7 +16,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install jsonschema
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.4"
+      - run: uv pip install --system jsonschema
 
       - name: Validate schema
         run: |
