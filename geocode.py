@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["certifi>=2026.10.19"]
+# ///
 """
 Open Itinerary Geocoder
 
@@ -9,23 +13,27 @@ and writes coordinates into the `coords` field.
 `coords` is always treated as a derived cache — this script unconditionally overwrites it.
 
 Usage:
-  python geocode.py <file.oitinerary.json>
-  python geocode.py <file.oitinerary.json> --dry-run
+  uv run geocode.py <file.oitinerary.json>
+  uv run geocode.py <file.oitinerary.json> --dry-run
 
 Nominatim usage policy: 1 request/second max, no bulk usage.
 This script enforces a 1.2s delay between requests automatically.
 """
 
 import json
+import ssl
 import sys
 import time
 import urllib.request
 import urllib.parse
 from pathlib import Path
 
+import certifi
+
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 USER_AGENT = "OpenItineraryGeocoder/0.2 (https://github.com/openitinerary/openitinerary)"
 DELAY_S = 1.2
+TLS_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
 
 def geocode(query: str) -> dict | None:
@@ -34,7 +42,7 @@ def geocode(query: str) -> dict | None:
     url = f"{NOMINATIM_URL}?{params}"
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, context=TLS_CONTEXT) as resp:
             data = json.loads(resp.read())
     except Exception as e:
         print(f"  !  geocode failed: {e}")
