@@ -226,8 +226,8 @@ print('Valid')
 ### Geocode it
 
 ```bash
-python geocode.py your-trip.json           # geocode in place
-python geocode.py your-trip.json --dry-run  # preview only
+uv run geocode.py your-trip.json           # geocode in place
+uv run geocode.py your-trip.json --dry-run  # preview only
 ```
 
 ### For AI tool developers
@@ -286,11 +286,13 @@ See [examples/sf-to-la.oitinerary.kdl](./examples/sf-to-la.oitinerary.kdl) (3-da
 
 ## Geocoder
 
+Use uv 0.13.4 or later to install the script dependencies from its lockfile. The geocoder uses certifi 2026.10.19 or later for HTTPS certificate verification, including the eMudhra compromise remediation.
+
 `geocode.py` reads a `.oitinerary.json` file, queries Nominatim (OpenStreetMap) for every stop and alternative, and writes coordinates into `location.coords`. It unconditionally overwrites any existing coords, because `name` is always truth.
 
 ```bash
-python geocode.py my-trip.json
-python geocode.py my-trip.json --dry-run
+uv run geocode.py my-trip.json
+uv run geocode.py my-trip.json --dry-run
 ```
 
 Nominatim is free and requires no API key. The script enforces a 1.2s rate limit automatically. For higher volume, swap in Photon (`https://photon.komoot.io/api`) as a drop-in alternative.
