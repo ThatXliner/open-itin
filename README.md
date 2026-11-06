@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="brag-output/brag.mp4"><img src="brag-output/brag.jpg" alt="Watch the 22-second Open Itinerary video" width="720"></a>
-  <br><sub><a href="brag-output/brag.mp4">▶ Watch the 22-second video</a></sub>
+  <a href="https://youtu.be/B5NRRPKyh7w"><img src="brag-output/brag.jpg" alt="Watch the 22-second Open Itinerary video" width="720"></a>
+  <br><sub><a href="https://youtu.be/B5NRRPKyh7w">▶ Watch on YouTube</a></sub>
 </p>
 
 ---
