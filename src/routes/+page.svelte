@@ -1,5 +1,6 @@
 <script lang="ts">
   import Hero from '$lib/components/Hero.svelte';
+  import BragVideo from '$lib/components/BragVideo.svelte';
   import WhatItIs from '$lib/components/WhatItIs.svelte';
   import DesignHighlights from '$lib/components/DesignHighlights.svelte';
   import ExampleExplorer from '$lib/components/ExampleExplorer.svelte';
@@ -8,6 +9,7 @@
 </script>
 
 <Hero />
+<BragVideo />
 <hr class="border-gray-200 dark:border-gray-800" />
 <WhatItIs />
 <hr class="border-gray-200 dark:border-gray-800" />

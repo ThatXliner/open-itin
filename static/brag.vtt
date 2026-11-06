@@ -1,0 +1,19 @@
+WEBVTT
+
+00:00.000 --> 00:04.000
+[Music] Ask five AI agents to plan a road trip, and you get five different shapes.
+
+00:04.000 --> 00:08.000
+Open Itinerary. One format for travel plans. Agents output it. Apps consume it.
+
+00:08.000 --> 00:12.000
+A KDL format agents write cheaply: 27% fewer tokens on the SF to LA example.
+
+00:12.000 --> 00:16.000
+Apps render it.
+
+00:16.000 --> 00:18.000
+Validate it with a JSON Schema. Valid Open Itinerary v0.2 document.
+
+00:18.000 --> 00:22.000
+Boring, useful, and open. bryanhu.com/open-itin
