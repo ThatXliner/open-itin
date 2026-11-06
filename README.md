@@ -8,6 +8,11 @@
   <a href="https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json"><img alt="JSON Schema" src="https://img.shields.io/badge/JSON%20Schema-open--itin-64748b"></a>
 </p>
 
+<p align="center">
+  <a href="brag-output/brag.mp4"><img src="brag-output/brag.jpg" alt="Watch the 22-second Open Itinerary video" width="720"></a>
+  <br><sub><a href="brag-output/brag.mp4">▶ Watch the 22-second video</a></sub>
+</p>
+
 ---
 
 ## The problem
