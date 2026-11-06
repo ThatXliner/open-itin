@@ -1,6 +1,12 @@
-# Open Itinerary
+<h1 align="center">Open Itinerary</h1>
 
-**An open, token-efficient JSON format for travel itineraries, designed for AI agents to output and apps to consume.**
+<p align="center"><strong>An open, token-efficient JSON format for travel itineraries, designed for AI agents to output and apps to consume.</strong></p>
+
+<p align="center">
+  <a href="https://bryanhu.com/open-itin/"><img alt="Website" src="https://img.shields.io/badge/website-bryanhu.com%2Fopen--itin-2563eb"></a>
+  <img alt="Spec version 0.2 alpha" src="https://img.shields.io/badge/spec-v0.2%20alpha-0f172a">
+  <a href="https://raw.githubusercontent.com/ThatXliner/open-itin/main/open-itin.schema.json"><img alt="JSON Schema" src="https://img.shields.io/badge/JSON%20Schema-open--itin-64748b"></a>
+</p>
 
 ---
 
