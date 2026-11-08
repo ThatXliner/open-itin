@@ -297,7 +297,7 @@ See [examples/sf-to-la.oitinerary.kdl](./examples/sf-to-la.oitinerary.kdl) (3-da
 
 ## Geocoder
 
-Use uv 0.13.4 or later to install the script dependencies from its lockfile. The geocoder uses certifi 2026.10.19 or later for HTTPS certificate verification, including the eMudhra compromise remediation.
+Use uv 0.13.4 or later to install the script dependencies from its lockfile. The geocoder uses certifi 2026.10.19 or later for HTTPS certificate verification.
 
 `geocode.py` reads a `.oitinerary.json` file, queries Nominatim (OpenStreetMap) for every stop and alternative, and writes coordinates into `location.coords`. It unconditionally overwrites any existing coords, because `name` is always truth.
 
@@ -332,14 +332,10 @@ Turn-by-turn routing, real-time status, booking data, split payments, multi-trav
 
 MIT
 
-## TLS runtime requirements
+## Runtime requirements
 
-Build and install with Node.js `^22.23.4 || ^24.22.1 || >=26.12.1`. The `.nvmrc` pins 22.23.4. Older Node releases are unsupported following the [eMudhra intermediate CA compromise](https://emudhra.we-have-a-problem.com/). Use the committed lockfile with `npm ci`. Bun is not a supported installer while its certificate fix is pending.
-
-This floor covers JavaScript build tools and package downloads. Browser and Tauri webview HTTPS requests use the browser or operating system verifier, so keep those updated too.
-
-Run `node scripts/check-tls.mjs` to verify both compromised test chains are rejected and `https://example.com/` still succeeds. Timeouts and DNS errors fail this check.
+Build and install with Node.js `^22.23.4 || ^24.22.1 || >=26.12.1`. The `.nvmrc` pins 22.23.4. Use the committed lockfile with `npm ci`.
 
 The npm configuration preserves the previous Bun lockfile versions with `legacy-peer-deps=true`.
 
-For the website build, also run `npm ci --prefix agent-format` and `npm test --prefix agent-format`. CI installs Python schema tooling with uv 0.13.4. The agent-format CLI itself reads local files and has no HTTP path.
+For the website build, also run `npm ci --prefix agent-format` and `npm test --prefix agent-format`. CI installs Python schema tooling with uv 0.13.4.
