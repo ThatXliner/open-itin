@@ -45,19 +45,15 @@ Spawn subagents to research simultaneously. Each subagent should return structur
 
 Run all three agents in parallel. Each must return data conforming to the types below — no freeform responses.
 
-### 3. Assemble and validate
+### 3. Write and validate
 
-After collecting research, assemble the full itinerary document (see Format Reference below). Then validate it:
+Assemble the full itinerary (see Format Reference below) and write it to `examples/<slug>.oitinerary.kdl`. Then validate it from the repository root:
 
 ```bash
-cd agent-format && bun run src/cli.ts validate <file>
+bun run agent-format/src/cli.ts validate examples/<slug>.oitinerary.kdl
 ```
 
-If validation fails, fix the errors and re-validate.
-
-### 4. Write the file
-
-Write the validated itinerary to `examples/<slug>.oitinerary.kdl`. Also print a human-readable summary.
+It prints `OK` on success. On an error, fix the file and run it again. Finish with a human-readable summary of the trip.
 
 ## Open Itinerary format Reference
 
