@@ -1,8 +1,6 @@
 ---
 name: open-itin
 description: Generate travel itineraries in the Open Itinerary format. Use when the user asks to plan a trip, create an itinerary, or generate a .oitinerary.kdl file.
-type: agent
-agentic: true
 ---
 
 # Open Itinerary Generator
