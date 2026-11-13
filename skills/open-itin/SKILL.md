@@ -15,13 +15,7 @@ When asked to create an itinerary, follow this process:
 
 ### 1. Gather requirements
 
-Ask the user (or infer from the prompt):
-- **Destination(s)**: Where are they going?
-- **Dates**: How many days, and on what dates?
-- **Preferences**: Budget level, interests, pace, dietary needs, etc.
-- **Starting point**: Where does the trip begin?
-
-If any of these are missing, ask the user before proceeding.
+You need the destination(s) and the trip length (dates or a number of days). Ask if the request lacks either. Infer the rest from the request: starting point, budget level, interests, pace, dietary needs. Where it says nothing, choose a sensible default and list your assumptions in the summary.
 
 ### 2. Research
 
