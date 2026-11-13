@@ -146,7 +146,6 @@ flex pick=<n> {
 - Notes should be concrete and useful, not generic ("Book online to skip the line" not "Popular attraction")
 - Include at least one `flex` block per day for optional choices
 - For each major stop, include 1-3 `alt` blocks as alternatives
-- Budget meals: $15-25, mid-range: $30-60, fine dining: $80+
 
 ## Example subagent prompts
 
