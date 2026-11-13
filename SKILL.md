@@ -141,6 +141,7 @@ flex pick=<n> {
 - Every route must have: `mode` and `note` (traffic tips, scenic options, logistics)
 - Routes must reference stops that exist — `from` and `to` must match `stop` ids
 - Day items must reference stops/routes that are defined
+- `validate` checks syntax and required fields only. It does not catch a `from`, `to` or `ref` that names a missing id, so check those yourself
 - Durations use decimal hours: `min=1.5 max=2.5` (not minutes)
 - Stop/route IDs use kebab-case: `"golden-gate-bridge"`, not `"goldenGateBridge"`
 - Notes should be concrete and useful, not generic ("Book online to skip the line" not "Popular attraction")
