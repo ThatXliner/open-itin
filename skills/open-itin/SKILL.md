@@ -145,21 +145,8 @@ flex pick=<n> {
 - Stop/route IDs use kebab-case: `"golden-gate-bridge"`, not `"goldenGateBridge"`
 - Notes should be concrete and useful, not generic ("Book online to skip the line" not "Popular attraction")
 - Include at least one `flex` block per day for optional choices
+- Days run from about 8-9am to no later than 10pm
 - For each major stop, include 1-3 `alt` blocks as alternatives
-
-## Example subagent prompts
-
-When spawning the **Stops agent**:
-
-> Research stops for a {N}-day trip to {destination}. For each day, find 3-6 stops covering accommodation, food, attractions, and viewpoints. Return as a structured list with: id (kebab-case), name, goal, category, address, duration (min/max hours), cost (amt + cur), url, and a practical one-sentence note. For 2-3 major stops per day, include 1-3 alternatives. Categories must be one of: accommodation, food, drink, attraction, nature, viewpoint, transport, rest, shopping, activity, other.
-
-When spawning the **Routes agent**:
-
-> Given these stops: [list stop ids], plan routes between consecutive stops. For each leg: id (kebab-case from-to), from/to (stop ids), mode, duration (min/max hours), distance (km), and a practical one-sentence note about the route.
-
-When spawning the **Days agent**:
-
-> Given these stops and routes, assemble a day-by-day timeline. Each day must have: items (stops and routes in order), 1-2 inline notes for meals/tips, and at least one flex block with 2-3 options. Morning starts around 8-9am, evening ends by 10pm.
 
 ## Token efficiency
 
