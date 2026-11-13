@@ -23,27 +23,11 @@ Ask the user (or infer from the prompt):
 
 If any of these are missing, ask the user before proceeding.
 
-### 2. Research in parallel
+### 2. Research
 
-Spawn subagents to research simultaneously. Each subagent should return structured data:
+Research the stops first: 3-8 per day, each with the fields the Stop reference below lists, costs in local currency, and 1-3 alternatives for major stops. Routes and the day plan both need the stop ids, so plan the routes between consecutive stops next, then lay out each day in a logical order, with inline notes for meals and transitions and flex blocks where the traveler might want a choice.
 
-**Stops agent** — Research 3-8 stops per day. For each stop return:
-- id (kebab-case slug), name, goal (one sentence), category, address
-- duration range in hours (min/max), cost estimate in local currency
-- URL if relevant, one-sentence note with a practical tip
-- 1-3 alternatives (alt blocks) for major stops
-
-**Routes agent** — For each leg between stops:
-- id, from/to (stop ids), mode (drive/fly/train/bus/walk/bike/transit/ferry/other)
-- duration min/max in hours, distance in km
-- one-sentence practical note (traffic tips, scenic options, etc.)
-
-**Days agent** — Assemble the day-by-day timeline:
-- Assign stops and routes to each day in a logical order
-- Add inline notes for meals, tips, transitions
-- Add flex blocks (pick-N choices) where the user might want options
-
-Run all three agents in parallel. Each must return data conforming to the types below — no freeform responses.
+Use subagents where the work splits independently, such as researching the stops for several days or regions at once. Ask each one to return data in the format below, not prose.
 
 ### 3. Write and validate
 
